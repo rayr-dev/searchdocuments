@@ -1,0 +1,2 @@
+pyinstaller --noconsole --onefile --icon=Search-documents.ico --version-file=version_info.txt --splash Search-documents.png --hidden-import openpyxl --name "FileReconcilationTool" Search-documents.py
+

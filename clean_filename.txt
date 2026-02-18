@@ -1,0 +1,9 @@
+# tests/test_normalization_property.py
+from hypothesis import given, strategies as st
+from Search-documents import clean_filename
+
+@given(st.text())
+def test_clean_filename_idempotent(s):
+    once = clean_filename(s)
+    twice = clean_filename(once)
+    assert once == twice
