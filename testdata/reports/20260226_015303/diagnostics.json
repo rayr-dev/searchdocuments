@@ -1,0 +1,48 @@
+{
+  "matches": [
+    [
+      "test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/target\\test 1.txt"
+    ],
+    [
+      "test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/target\\Sub A\\test 1.txt"
+    ],
+    [
+      "test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/target\\Sub B\\test 1.txt"
+    ]
+  ],
+  "mismatched": [
+    [
+      "test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - diff content.txt",
+      [
+        [
+          "D:/dev/Projects/Search-documents/testdata/target\\test 1 - diff content.txt",
+          16,
+          1771895436.54507
+        ],
+        [
+          "D:/dev/Projects/Search-documents/testdata/target\\Sub A\\test 1 - diff content.txt",
+          16,
+          1771895436.54507
+        ],
+        [
+          "D:/dev/Projects/Search-documents/testdata/target\\Sub B\\test 1 - diff content.txt",
+          16,
+          1771895436.54507
+        ]
+      ]
+    ]
+  ],
+  "missing": [
+    [
+      "test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - missing.txt"
+    ]
+  ]
+}

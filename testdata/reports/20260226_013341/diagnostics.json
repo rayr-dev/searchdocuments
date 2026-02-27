@@ -1,0 +1,51 @@
+{
+  "matches": [
+    [
+      "test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\test 1 - diff content.txt"
+    ],
+    [
+      "test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub A\\test 1 - diff content.txt"
+    ],
+    [
+      "test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - diff content.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - diff content.txt"
+    ],
+    [
+      "test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\test 1 - missing.txt"
+    ],
+    [
+      "test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub A\\test 1 - missing.txt"
+    ],
+    [
+      "test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - missing.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1 - missing.txt"
+    ],
+    [
+      "test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\test 1.txt"
+    ],
+    [
+      "test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub A\\test 1.txt"
+    ],
+    [
+      "test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt",
+      "D:/dev/Projects/Search-documents/testdata/source\\Sub B\\test 1.txt"
+    ]
+  ],
+  "mismatched": [],
+  "missing": []
+}
