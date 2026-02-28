@@ -1,10 +1,9 @@
-from utilities.diagnostics import diag
-from utilities.diagnostics import dump_diagnostics
+from utilities.diagnostics_old import dump_diagnostics
 from utilities.scan_folder import dump_scan_results
 from utilities.path_utils import file_hash
 from writers.write_all_reports import write_all_reports
 from writers.summary_writer import print_summary
-
+from utilities.logging_setup import diag
 
 def compare_folders_recursive(folderA, folderB,
                               output_dir,
@@ -19,7 +18,8 @@ def compare_folders_recursive(folderA, folderB,
 
     from utilities.output import create_timestamped_folder
     from utilities.scan_folder import scan_folder
-    
+
+    diag("Compare Engine: Starting run compare_folders_recursive")
     # Apply timestamped output behavior ONCE
     if config.TIMESTAMPED_OUTPUT:
         output_dir = create_timestamped_folder(output_dir)

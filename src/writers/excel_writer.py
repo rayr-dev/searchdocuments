@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 def write_excel_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):

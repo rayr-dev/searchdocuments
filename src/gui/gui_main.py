@@ -1,10 +1,5 @@
 # gui/gui_main.py
 
-import os
-import sys
-import time
-import traceback
-
 #Constants
 #TODO: Add constants where necessary
 
@@ -16,18 +11,19 @@ pyi_splash = None
 # ---------------------------------------------------------
 # Imports with diagnostics
 # ---------------------------------------------------------
-try:
-    import tkinter as tk
-    import tkinter.ttk as ttk
-    from tkinter import filedialog, messagebox
-    import config
-    from orchestrator import run_reconciliation
-    from utilities.diagnostics import diag
+#System Imports
+import os
+import sys
+import time
 
-except Exception:
-    traceback.print_exc()
-    sys.exit(1)
-
+#Local imports
+import tkinter as tk
+import tkinter.ttk as ttk
+from tkinter import filedialog, messagebox
+import config
+from orchestrator import run_reconciliation
+from utilities.logging_setup import init_logging, diag
+import logging
 
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
@@ -43,6 +39,13 @@ def launch_gui():
     # Optional PyInstaller splash
     # -----------------------------
     # Only attempts splash if frozen
+
+    diag("GUI Main: Starting launch gui")
+    logging.info("Logging Info")
+    logging.warning("Warning Info")
+    logging.error("Error info")
+    logging.exception("Exception Info")
+    logging.critical("Critical Info")
 
     if getattr(sys, 'frozen', False):
         try:
@@ -160,6 +163,15 @@ def launch_gui():
                    variable=compare_mode_var, value="hashonly").pack(anchor="w", padx=40)
 
     # -----------------------------
+    # Find all Files Options
+    # -----------------------------
+    tk.Label(root, text="Find All Files (multiple files is Source location:", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
+
+    tk.Checkbutton(root, text="Find All Files",
+                   variable=find_all_var).pack(anchor="w",
+                                             padx=40)
+
+    # -----------------------------
     # Cleanup Options
     # -----------------------------
     tk.Label(root, text="Cleanup Options:", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
@@ -184,6 +196,7 @@ def launch_gui():
     # Run Button Handler
     # -----------------------------
     def run_clicked():
+
         folderA = folderA_var.get()
         folderB = folderB_var.get()
         output_dir = output_dir_var.get()
@@ -200,11 +213,19 @@ def launch_gui():
         config.DELETE_CANDIDATES = deletecandidates_var.get()
         config.USE_QUARANTINE = quarantine_var.get()
 
+        log_path = init_logging(output_dir, diagnostic=config.DIAGNOSTIC_MODE)
+        logging.info(f"GUI Log file created: {log_path}")
         diag("Run button clicked")
         diag(f"FolderA: {folderA}")
         diag(f"FolderB: {folderB}")
         diag(f"Output: {output_dir}")
         diag(f"Mode: {mode}")
+        diag(f"Dry Run: {dryrun_var.get()}")
+        diag(f"Exact Matches: {deletematches_var.get()}")
+        diag(f"Delete Candidates: {deletecandidates_var.get()}")
+        diag(f"Quarantive: {quarantine_var.get()}")
+        diag(f"Find All Files: {find_all_var.get()}")
+
 
         try:
             set_status("Starting comparison...")
@@ -281,7 +302,9 @@ def launch_gui():
                        lambda e: validate_all_paths())
     output_entry.bind("<FocusOut>",
                       lambda e: validate_all_paths())
-
+    # -----------------------------
+    # Find All Files
+    # -----------------------------
 
 
     # -----------------------------

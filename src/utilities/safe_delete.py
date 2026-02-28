@@ -1,7 +1,7 @@
 import os
 import shutil
 import config
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 # Safe deleter (respects DRY_RUN)
 def safe_delete(path: str):

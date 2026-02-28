@@ -3,7 +3,7 @@ from writers.excel_writer import write_excel_output
 from writers.csv_writer import write_csv_output
 from writers.text_writer import write_text_output
 from writers.summary_writer import build_summary
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 def write_all_reports(output_dir, matches, mismatched, missing,
                       status_callback=None, progress_callback=None):

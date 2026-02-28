@@ -1,7 +1,7 @@
 import os
 import csv
 from datetime import datetime
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 def write_csv_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):

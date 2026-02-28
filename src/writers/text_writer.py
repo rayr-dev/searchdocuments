@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 def write_text_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):
@@ -85,4 +85,3 @@ def write_text_output(output_dir, matches, mismatched, missing,
                 f.write(f"  A: {pathA}\n\n")
     except Exception as e:
         diag(f"ERROR writing Text report: {e}")
-        print(f"ERROR writing Text report: {e}")

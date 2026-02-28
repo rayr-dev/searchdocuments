@@ -1,14 +1,20 @@
 # cli/cli_main.py
 
-import argparse
-import sys
-import config
-from orchestrator import run_reconciliation
-from utilities.diagnostics import diag
-from writers.summary_writer import print_summary
-
+try:
+    import argparse
+    import logging
+    import sys
+    import config
+    import traceback
+    from orchestrator import run_reconciliation
+    from utilities.logging_setup import init_logging, diag
+    from writers.summary_writer import print_summary
+except ImportError:
+    traceback.print_exc()
+    sys.exit(1)
 
 def build_parser():
+    logging.info("CLI Main: Starting build_parser")
     parser = argparse.ArgumentParser(
         description="Reconciliation Tool - Command Line Interface"
     )
@@ -81,6 +87,18 @@ def run_cli():
     parser = build_parser()
     args = parser.parse_args()
 
+    # Set config flags
+    config.DIAGNOSTIC_MODE = args.diagnostic
+
+    # Initialize logging for CLI
+    log_path = init_logging(args.output_dir, diagnostic=config.DIAGNOSTIC_MODE)
+    logging.info(f"CLI run started. Log file: {log_path}")
+    logging.info("Logging Info")
+    logging.warning("Warning Info")
+    logging.error("Error info")
+    logging.exception("Exception Info")
+    logging.critical("Critical Info")
+
     # Reset config
     config.initialize_runtime()
 
@@ -123,9 +141,9 @@ def run_cli():
         )
 
     except Exception as e:
-        print(f"ERROR: {e}")
+        logging.info(f"ERROR: {e}")
         diag(f"CLI ERROR: {e}")
         sys.exit(1)
     # Print summary once, after successful run
-    print(f"\nReports written to: {args.output}")
+    logging.info(f"\nReports written to: {args.output}")
     print_summary(summary_text)

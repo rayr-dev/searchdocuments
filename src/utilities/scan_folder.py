@@ -1,5 +1,5 @@
 import os
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 def scan_folder(folder, multi=False):
     results = {}

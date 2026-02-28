@@ -1,7 +1,7 @@
 import os
 import unicodedata
 import hashlib
-from utilities.diagnostics import diag
+from utilities.logging_setup import diag
 
 def normalize_path(path: str) -> str:
     """
