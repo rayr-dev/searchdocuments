@@ -1,7 +1,7 @@
 # gui/gui_main.py
 
 #Constants
-#TODO: Add constants where necessary
+#TODO: SPLASHTIMER
 
 # ---------------------------------------------------------
 # Global splash handle (must exist before any function uses it)
@@ -51,7 +51,7 @@ def launch_gui():
         try:
             import pyi_splash
             pyi_splash.update_text("Loading GUI...")
-            time.sleep(2.0) # delay in seconds
+            time.sleep(1.5) # delay in seconds
             pyi_splash.close()
         except Exception:
             pass
@@ -62,8 +62,12 @@ def launch_gui():
     # -----------------------------
     root = tk.Tk()
     root.title("Search Documents Tool")
-    root.geometry("900x900")
-    root.resizable(False, False)
+    root.geometry("1100x1000")
+    root.resizable(True,
+                   True) #allow resizing
+    root.minsize(800,1000
+                 ) # Min size
+    root.configure(background="white")
 
     # -----------------------------
     # Tkinter Variables
@@ -79,6 +83,7 @@ def launch_gui():
     deletematches_var = tk.BooleanVar()
     deletecandidates_var = tk.BooleanVar()
     quarantine_var = tk.BooleanVar(value=True)
+    diagnostics_var = tk.BooleanVar(value=False) # Diagnostics
 
     # -----------------------------
     # Helper: Folder Browsers
@@ -104,17 +109,24 @@ def launch_gui():
     tk.Label(
         root,
         text="Output Folder:",
+        bg="white",
         font=("Segoe UI", 10, "bold")
-    ).pack(anchor="w", padx=20)
+    ).pack(anchor="w",
+           padx=20)
 
-    output_entry = tk.Entry(root, textvariable=output_dir_var, width=60)
-    output_entry.pack(anchor="w", padx=20)
+    output_entry = tk.Entry(root,
+                            textvariable=output_dir_var,
+                            width=60)
+    output_entry.pack(anchor="w",
+                      padx=20)
 
     tk.Button(
         root,
         text="Browse",
         command=browse_output_dir
-    ).pack(anchor="w", padx=20, pady=(0, 20))
+    ).pack(anchor="w",
+           padx=20,
+           pady=(0, 20))
 
     # -----------------------------
     # Folder A
@@ -122,75 +134,181 @@ def launch_gui():
     tk.Label(
         root,
         text="Folder A (Source):",
+        bg="white",
         font=("Segoe UI", 10, "bold")
-    ).pack(anchor="w", padx=20)
+    ).pack(anchor="w",
+           padx=20)
 
-    folderA_entry = tk.Entry(root, textvariable=folderA_var, width=60)
-    folderA_entry.pack(anchor="w", padx=20)
+    folderA_entry = tk.Entry(root, textvariable=folderA_var,
+                             width=60)
+    folderA_entry.pack(anchor="w",
+                       padx=20)
 
-    tk.Button(root,text="Browse",command=lambda: folderA_var.set(filedialog.askdirectory())).pack(anchor="w", padx=20, pady=(0, 10))
+    tk.Button(root,
+              text="Browse",
+              command=lambda: folderA_var.set(filedialog.askdirectory())).pack(anchor="w",
+                                                                               padx=20,
+                                                                               pady=(0, 10))
 
     # -----------------------------
     # Folder B
     # -----------------------------
     tk.Label(root,
              text="Folder B (Target):",
+             bg="white",
              font=("Segoe UI", 10, "bold")
              ).pack(anchor="w",
                     padx=20)
-    folderB_entry = tk.Entry(root,textvariable=folderB_var,width=60)
-    folderB_entry.pack(anchor="w",padx=20)
-    tk.Button(root,text="Browse",command=lambda: folderB_var.set(filedialog.askdirectory())).pack(anchor="w",padx=20,pady=(0, 10)
+    folderB_entry = tk.Entry(root,
+                             textvariable=folderB_var,
+                             width=60)
+    folderB_entry.pack(anchor="w",
+                       padx=20)
+    tk.Button(root,
+              text="Browse",
+              command=lambda: folderB_var.set(filedialog.askdirectory())).pack(anchor="w",
+                                                                               padx=20,
+                                                                               pady=(0, 10)
                 )
+    ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
     # -----------------------------
     # Comparison Options
     # -----------------------------
     tk.Label(root,
              text="Comparison Options:",
+             bg="white",
              font=("Segoe UI", 10, "bold")).pack(anchor="w",
                                                  padx=20)
 
     tk.Radiobutton(root,
                    text="Timestamp Comparison(Fastest)",
+                   bg="white",
                    variable=compare_mode_var,
-                   value="timestamp").pack(anchor="w", padx=40)
+                   value="timestamp").pack(anchor="w",
+                                           padx=40)
     tk.Radiobutton(root,
                    text="Hash Comparison(Accurate Slower)",
+                   bg="white",
                    variable=compare_mode_var,
-                   value="hash").pack(anchor="w", padx=40)
+                   value="hash").pack(anchor="w",
+                                      padx=40)
     tk.Radiobutton(root,
                    text="Hash-Only Mode (Accurate Moderate speed)",
-                   variable=compare_mode_var, value="hashonly").pack(anchor="w", padx=40)
+                   bg="white",
+                   variable=compare_mode_var, value="hashonly").pack(anchor="w",
+                                                                     padx=40)
+
+    ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
     # -----------------------------
     # Find all Files Options
     # -----------------------------
-    tk.Label(root, text="Find All Files (multiple files is Source location:", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
+    tk.Label(root,
+             text="Find All Files (multiple files is Source location:",
+             bg="white",
+             font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
 
     tk.Checkbutton(root, text="Find All Files",
+                   bg="white",
                    variable=find_all_var).pack(anchor="w",
                                              padx=40)
+
+    ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
     # -----------------------------
     # Cleanup Options
     # -----------------------------
-    tk.Label(root, text="Cleanup Options:", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
+    tk.Label(root,
+             text="Cleanup Options:",
+             bg="white",
+             font=("Segoe UI",
+                   10,
+                   "bold")).pack(anchor="w", padx=20)
 
     tk.Checkbutton(root, text="Dry Run (No Changes Made)",
+                   bg="white",
                    variable=dryrun_var).pack(anchor="w",
                                              padx=40)
 
     tk.Checkbutton(root, text="Delete Exact Matches",
+                   bg="white",
                    variable=deletematches_var).pack(anchor="w",
                                                     padx=40)
 
     tk.Checkbutton(root, text="Delete Mismatch Candidates",
+                   bg="white",
                    variable=deletecandidates_var).pack(anchor="w",
                                                        padx=40)
 
     tk.Checkbutton(root, text="Use Quarantine Folder",
+                   bg="white",
                    variable=quarantine_var).pack(anchor="w",
                                                  padx=40)
+
+    ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
+
+    # -----------------------------
+    # Output Diagnostics
+    # -----------------------------
+    tk.Label(
+        root,
+        text="Output Detail Level:",
+        bg="white",
+        font=("Segoe UI", 10, "bold")
+    ).pack(anchor="w",
+           padx=20)
+
+    tk.Checkbutton(
+        root,
+        text="Diagnostic Output",
+        bg="white",
+        variable=diagnostics_var
+    ).pack(anchor="w",
+           padx=20,
+           pady=(10, 10))
+
+    # -----------------------------
+    # Status Label
+    # -----------------------------
+    status_label = tk.Label(root,
+                            text="Status: Ready",
+                            anchor="w",
+                            bg="white",
+                            font=("Segoe UI", 10),
+                            relief="sunken",
+                            borderwidth=1,)
+    status_label.pack(fill="x",
+                      padx=20,
+                      pady=(10, 0))
+
+    def set_status(msg):
+        status_label.config(text=f"Status: {msg}")
+
+    # -----------------------------
+    # Progress Bar
+    # -----------------------------
+    progress_var = tk.DoubleVar()
+    progress_bar = ttk.Progressbar(root,
+                                   variable=progress_var,
+                                   maximum=100
+                                   )
+    progress_bar.pack(fill="x",
+                      padx=20,
+                      pady=(0, 10))
+
+    def set_progress(value):
+        progress_var.set(value)
+        root.update_idletasks()
+
+    # -----------------------------
+    # Status Callback
+    # -----------------------------
+    def gui_status_callback(message: str, level="high"):
+        include_diag = diagnostics_var.get()
+        if level == "detailed" and not include_diag:
+            return
+        summary_box.insert("end", message + "\n")
+        summary_box.see("end")
 
     # -----------------------------
     # Run Button Handler
@@ -226,7 +344,6 @@ def launch_gui():
         diag(f"Quarantive: {quarantine_var.get()}")
         diag(f"Find All Files: {find_all_var.get()}")
 
-
         try:
             set_status("Starting comparison...")
             set_progress(0)
@@ -250,23 +367,18 @@ def launch_gui():
             diag(f"GUI ERROR: {e}")
 
         # -----------------------------
-        # Run Button (must be AFTER summary_box exists)
-        # ---------------------------------------------------------
-        # Run Button (must be AFTER validator exists)
-        # ---------------------------------------------------------
-        run_button = tk.Button(root,
-                               text="Run Comparison",
-                               font=("Segoe UI", 11, "bold"),
-                               width=20,
-                               command=run_clicked,
-                               state="disabled")  # start disabled
-        run_button.pack(pady=20)
-    # ---------------------------------------------------------
-    # Run Button (must be AFTER validator exists)
-    # ---------------------------------------------------------
-    run_button=tk.Button(root,text="Run Comparison",font=("Segoe UI",11,"bold"),width=20,command=run_clicked,state="disabled") # start disabled
+        # Validator
+        # -----------------------------
 
-    run_button.pack(pady=20)
+    def validate_paths(*args):
+        if folderA_var.get() and folderB_var.get() and output_dir_var.get():
+            run_button.config(state="normal")
+        else:
+            run_button.config(state="disabled")
+
+    folderA_var.trace_add("write", validate_paths)
+    folderB_var.trace_add("write", validate_paths)
+    output_dir_var.trace_add("write", validate_paths)
 
     # ---------------------------------------------------------
     # VALIDATION FUNCTION (placed here so it sees all widgets)
@@ -302,46 +414,46 @@ def launch_gui():
                        lambda e: validate_all_paths())
     output_entry.bind("<FocusOut>",
                       lambda e: validate_all_paths())
-    # -----------------------------
-    # Find All Files
-    # -----------------------------
-
 
     # -----------------------------
-    # Status + Progress Bar
+    # Run Button
     # -----------------------------
-    status_var = tk.StringVar(value="Ready")
-    tk.Label(root, textvariable=status_var, font=("Segoe UI", 10, "bold"),
-             anchor="w").pack(fill="x", padx=20, pady=(10, 0))
-
-    progress = ttk.Progressbar(root, orient="horizontal", length=500, mode="determinate")
-    progress.pack(padx=20, pady=(0, 10))
-
-    def set_status(msg):
-        status_var.set(msg)
-        root.update_idletasks()
-
-    def set_progress(value, maximum=100):
-        progress["maximum"] = maximum
-        progress["value"] = value
-        root.update_idletasks()
+    run_button = tk.Button(
+        root,
+        text="Run Comparison",
+        font=("Segoe UI", 11, "bold"),
+        width=20,
+        command=run_clicked,
+        state="disabled"
+    )
+    run_button.pack(pady=20)
 
     # -----------------------------
     # Summary Output (MUST come before Run button)
     # -----------------------------
-    tk.Label(root, text="Summary:", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
+    tk.Label(root,
+             text="Summary:",
+             bg="white",
+             font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
 
     summary_frame = tk.Frame(root)
-    summary_frame.pack(fill="both", expand=True, padx=20, pady=10)
+    summary_frame.pack(fill="both",
+                       expand=True,
+                       padx=20, pady=10)
 
     scrollbar = tk.Scrollbar(summary_frame)
-    scrollbar.pack(side="right", fill="y")
+    scrollbar.pack(side="right",
+                   fill="y")
 
-    summary_box = tk.Text(summary_frame, width=80, height=15, yscrollcommand=scrollbar.set)
-    summary_box.pack(side="left", fill="both", expand=True)
+    summary_box = tk.Text(summary_frame,
+                          width=80,
+                          height=15,
+                          yscrollcommand=scrollbar.set)
+    summary_box.pack(side="left",
+                     fill="both",
+                     expand=True)
 
     scrollbar.config(command=summary_box.yview)
-
 
 
     root.mainloop()
