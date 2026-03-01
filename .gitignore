@@ -27,12 +27,6 @@ dist/
 ~*.*
 *~
 
-
-# Output files
-comparison.xlsx
-comparison.csv
-comparison.txt
-
 # Quarantine folder
 Quarantine/
 
@@ -52,6 +46,7 @@ Quarantine/
 *.csv
 *.txt
 summary.txt
+*.json
 
 # Executables and installers
 *.exe
@@ -72,3 +67,8 @@ desktop.ini
 
 # PyCharm
 .idea/
+
+#Python specific
+venv/
+__pycache__/
+.pytest_cache/

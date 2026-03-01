@@ -7,7 +7,7 @@ from utilities.logging_setup import diag
 def write_excel_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):
 
-    
+
 
     excel_path = os.path.join(output_dir, "comparison.xlsx")
 
@@ -17,7 +17,7 @@ def write_excel_output(output_dir, matches, mismatched, missing,
     if progress_callback:
         progress_callback(60)
     diag("ENTERING EXCEL WRITER")
-    
+
     try:
         wb = Workbook()
         ws = wb.active

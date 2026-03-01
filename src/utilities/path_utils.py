@@ -51,4 +51,3 @@ def file_hash(path: str) -> str:
         return None
 
     return h.hexdigest()
-	

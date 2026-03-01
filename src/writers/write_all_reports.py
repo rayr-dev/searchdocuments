@@ -12,9 +12,9 @@ def write_all_reports(output_dir, matches, mismatched, missing,
     Ensures each writer is isolated so one failure does not break the others.
     Provides consistent diagnostic output and callback handling.
     """
-   
 
- 
+
+
     # Ensure output directory exists
     try:
         os.makedirs(output_dir, exist_ok=True)
@@ -77,8 +77,8 @@ def write_all_reports(output_dir, matches, mismatched, missing,
         diag(f"ERROR writing Text report: {e}")
         if status_callback:
             status_callback(f"ERROR writing Text report: {e}")
-            
-    
+
+
     # Write summary.txt
     build_summary(output_dir, matches, mismatched, missing,
                      progress_callback, status_callback)

@@ -1,7 +1,18 @@
-import os
-from datetime import datetime
-import logging
+# utilities/logging_setup.py
+try:
+    # System
+    import os
+    import sys
+    from datetime import datetime
+    import logging
+    import traceback
 
+    # 3rd Party
+
+    # Local
+except ImportError:
+    traceback.print_exc()
+    sys.exit(1)  # exit with an error code 1
 
 def init_logging(output_dir=None, diagnostic=False):
     """

@@ -1,0 +1,9 @@
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes rules
+    "W",   # pycodestyle warnings
+]
+ignore = [
+    "E501",  # ignore line too long
+]

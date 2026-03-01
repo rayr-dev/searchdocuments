@@ -7,7 +7,7 @@ def write_csv_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):
 
     csv_path = os.path.join(output_dir, "comparison.csv")
-    
+
     if status_callback:
         status_callback(f"Writing CSV report to: {csv_path}")
     if progress_callback:

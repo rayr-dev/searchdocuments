@@ -5,10 +5,10 @@ from utilities.logging_setup import diag
 def write_text_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):
 
-    
-    
+
+
     txt_path = os.path.join(output_dir, "comparison.txt")
-    
+
     # Optional: writer-level status update
     if status_callback:
         status_callback(f"Writing Text report to: {txt_path}")

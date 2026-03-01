@@ -1,29 +1,28 @@
 # gui/gui_main.py
 
+try:
+    # System
+    import os
+    import sys
+    import time
+    import config
+    import logging
+
+    #3d Party
+    import tkinter as tk
+    import tkinter.ttk as ttk
+    from tkinter import filedialog, messagebox
+
+    #local
+    from orchestrator import run_reconciliation
+    from utilities.logging_setup import init_logging, diag
+
+except ImportError:
+    traceback.print_exc()
+    sys.exit(1) #exit with an error code 1
+
 #Constants
 #TODO: SPLASHTIMER
-
-# ---------------------------------------------------------
-# Global splash handle (must exist before any function uses it)
-# ---------------------------------------------------------
-pyi_splash = None
-
-# ---------------------------------------------------------
-# Imports with diagnostics
-# ---------------------------------------------------------
-#System Imports
-import os
-import sys
-import time
-
-#Local imports
-import tkinter as tk
-import tkinter.ttk as ttk
-from tkinter import filedialog, messagebox
-import config
-from orchestrator import run_reconciliation
-from utilities.logging_setup import init_logging, diag
-import logging
 
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
@@ -51,7 +50,7 @@ def launch_gui():
         try:
             import pyi_splash
             pyi_splash.update_text("Loading GUI...")
-            time.sleep(1.5) # delay in seconds
+            time.sleep(1) # delay in seconds
             pyi_splash.close()
         except Exception:
             pass

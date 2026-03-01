@@ -13,7 +13,7 @@ def temp_dir():
         yield d
     finally:
         shutil.rmtree(d, ignore_errors=True)
-        
+
 @pytest.fixture
 def temp_output_dir():
     """
@@ -57,7 +57,7 @@ def read_file():
         with open(path, "r", encoding="utf-8", errors="replace") as f:
             return f.read()
     return _reader
-    
+
 # tests/conftest.py (add below your other fixtures)
 
 def _random_filename():
@@ -154,7 +154,7 @@ def randomized_folder_structure():
 
     finally:
         shutil.rmtree(root, ignore_errors=True)
-        
+
 # tests/conftest.py (append below your other fixtures)
 
 def _randname():
