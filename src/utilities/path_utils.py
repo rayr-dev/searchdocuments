@@ -2,6 +2,7 @@
 # System
 import os
 import sys
+import json
 import unicodedata
 import hashlib
 
@@ -75,3 +76,28 @@ def resource_path(relative_path: str) -> str:
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
+
+def get_version() -> str:
+    """Read version from version_info.txt."""
+    try:
+        version_path = resource_path("version_info.txt")
+        with open(version_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("version", "Unknown")
+    except Exception:
+        return "Unknown"
+
+def get_version_info() -> dict:
+    """Read full version info from version_info.txt."""
+    try:
+        version_path = resource_path("version_info.txt")
+        with open(version_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {
+            "version": "Unknown",
+            "build": "Unknown",
+            "author": "Unknown",
+            "description": "Unknown",
+            "release": "Unknown"
+        }

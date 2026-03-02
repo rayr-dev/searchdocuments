@@ -15,50 +15,76 @@ from tkinter import filedialog, messagebox
 #local
 from orchestrator import run_reconciliation
 from utilities.logging_setup import init_logging, diag
+from utilities.path_utils import get_version, get_version_info
 
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
 # ---------------------------------------------------------
 def main():
-    launch_gui()
-
-# ---------------------------------------------------------
-# GUI BUILDER
-# ---------------------------------------------------------
-def launch_gui():
+    # This is correct - set up before GUI launches
     # -----------------------------
     # Optional PyInstaller splash
     # -----------------------------
     # Only attempts splash if frozen
 
-    diag("GUI Main: Starting launch gui")
-    logging.info("Logging Info")
-    logging.warning("Warning Info")
-    logging.error("Error info")
-    logging.exception("Exception Info")
-    logging.critical("Critical Info")
-
     if getattr(sys, 'frozen', False):
         try:
             import pyi_splash
             pyi_splash.update_text("Loading GUI...")
-            time.sleep(1) # delay in seconds
+            time.sleep(1)  # delay in seconds
             pyi_splash.close()
         except Exception:
             pass
+        # -----------------------------
+        # # Step 1 - read version first
+        # -----------------------------
 
+    version = get_version()
+    info = get_version_info()
+
+    diag("GUI Main: Starting launch gui")
 
     # -----------------------------
     # Main Window
     # -----------------------------
     root = tk.Tk()
-    root.title("Search Documents Tool")
+    root.title(f"Search Documents v{version}")  # ← now root exists
     root.geometry("1100x1000")
     root.resizable(True,
-                   True) #allow resizing
-    root.minsize(800,1000
-                 ) # Min size
+                   True)  # allow resizing
+    root.minsize(800, 1000
+                 )  # Min size
     root.configure(background="white")
+
+    launch_gui(root, info)
+
+# ---------------------------------------------------------
+# GUI BUILDER
+# ---------------------------------------------------------
+def launch_gui(root, info):
+    # -----------------------------
+    # Menu Bar
+    # -----------------------------
+    menubar = tk.Menu(root)
+
+    # -----------------------------
+    # About Dialog
+    # -----------------------------
+    def show_about():
+        about_text = (
+            f"Search Documents Tool\n\n"
+            f"Version:     {info['version']}\n"
+            f"Build:       {info['build']}\n"
+            f"Author:      {info['author']}\n"
+            f"Description: {info['description']}\n"
+            f"Release:     {info['release']}\n"
+        )
+        messagebox.showinfo("About Search Documents", about_text)
+
+    help_menu = tk.Menu(menubar, tearoff=0)
+    help_menu.add_command(label="About", command=show_about)
+    menubar.add_cascade(label="Help", menu=help_menu)
+    root.config(menu=menubar)
 
     # -----------------------------
     # Tkinter Variables
@@ -306,6 +332,13 @@ def launch_gui():
     # -----------------------------
     def run_clicked():
 
+        try:
+            print(f"Run clicked - FolderA: {folderA_var.get()}")
+            print(f"FolderB: {folderB_var.get()}")
+            print(f"Output: {output_dir_var.get()}")
+        except Exception as e:
+            print(f"Early error: {e}")
+
         folderA = folderA_var.get()
         folderB = folderB_var.get()
         output_dir = output_dir_var.get()
@@ -321,6 +354,7 @@ def launch_gui():
         config.DELETE_EXACT_MATCHES = deletematches_var.get()
         config.DELETE_CANDIDATES = deletecandidates_var.get()
         config.USE_QUARANTINE = quarantine_var.get()
+        config.DIAGNOSTIC_MODE = diagnostics_var.get()
 
         log_path = init_logging(output_dir, diagnostic=config.DIAGNOSTIC_MODE)
         logging.info(f"GUI Log file created: {log_path}")
@@ -329,11 +363,11 @@ def launch_gui():
         diag(f"FolderB: {folderB}")
         diag(f"Output: {output_dir}")
         diag(f"Mode: {mode}")
-        diag(f"Dry Run: {dryrun_var.get()}")
-        diag(f"Exact Matches: {deletematches_var.get()}")
-        diag(f"Delete Candidates: {deletecandidates_var.get()}")
-        diag(f"Quarantive: {quarantine_var.get()}")
-        diag(f"Find All Files: {find_all_var.get()}")
+        diag(f"Dry Run: {config.DRY_RUN}")
+        diag(f"Exact Matches: {config.HASH_ONLY_MODE}")
+        diag(f"Delete Candidates: {config.DELETE_CANDIDATES}")
+        diag(f"Quarantine: {config.USE_QUARANTINE}")
+        diag(f"Find All Files: {config.FIND_ALL_LOCATIONS_MODE}")
 
         try:
             set_status("Starting comparison...")
@@ -355,26 +389,13 @@ def launch_gui():
 
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred:\n{e}")
+            logging.error(f"GUI ERROR: {e}")
             diag(f"GUI ERROR: {e}")
-
-        # -----------------------------
-        # Validator
-        # -----------------------------
-
-    def validate_paths(*args):
-        if folderA_var.get() and folderB_var.get() and output_dir_var.get():
-            run_button.config(state="normal")
-        else:
-            run_button.config(state="disabled")
-
-    folderA_var.trace_add("write", validate_paths)
-    folderB_var.trace_add("write", validate_paths)
-    output_dir_var.trace_add("write", validate_paths)
 
     # ---------------------------------------------------------
     # VALIDATION FUNCTION (placed here so it sees all widgets)
     # ---------------------------------------------------------
-    def validate_all_paths():
+    def validate_all_paths(*args):
         a = folderA_var.get().strip()
         b = folderB_var.get().strip()
         o = output_dir_var.get().strip()
@@ -388,6 +409,12 @@ def launch_gui():
         output_entry.config(bg="white" if validO or not o else "#ffcccc")
 
         run_button.config(state="normal" if (validA and validB and validO) else "disabled")
+
+    folderA_var.trace_add("write", validate_all_paths)
+    folderB_var.trace_add("write", validate_all_paths)
+    output_dir_var.trace_add("write", validate_all_paths)
+
+
 
     # ---------------------------------------------------------
     # Bind validation to typing + focus loss
