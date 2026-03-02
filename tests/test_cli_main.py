@@ -118,6 +118,7 @@ def test_build_parser_all_flags_default_false():
 # -----------------------------
 PATCH_RECONCILE = "src.cli.cli_main.run_reconciliation"
 PATCH_LOGGING   = "src.cli.cli_main.init_logging"
+PATCH_INIT      = "src.cli.cli_main.config.initialize_runtime"
 
 def test_run_cli_sets_hash_only_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -126,9 +127,11 @@ def test_run_cli_sets_hash_only_mode(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   hashonly=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT,      return_value=None):
         run_cli()
-    assert config.HASH_ONLY_MODE == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.HASH_ONLY_MODE == True
 
 def test_run_cli_sets_hash_compare_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -137,9 +140,11 @@ def test_run_cli_sets_hash_compare_mode(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   hash=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.HASH_COMPARE_MODE == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.HASH_COMPARE_MODE == True
 
 def test_run_cli_sets_dry_run(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -148,9 +153,11 @@ def test_run_cli_sets_dry_run(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   dryrun=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.DRY_RUN == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.DRY_RUN == True
 
 def test_run_cli_sets_find_all(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -159,9 +166,11 @@ def test_run_cli_sets_find_all(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   findall=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.FIND_ALL_LOCATIONS_MODE == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.FIND_ALL_LOCATIONS_MODE == True
 
 def test_run_cli_sets_delete_matches(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -170,9 +179,11 @@ def test_run_cli_sets_delete_matches(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   deletematches=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.DELETE_EXACT_MATCHES == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.DELETE_EXACT_MATCHES == True
 
 def test_run_cli_sets_delete_candidates(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -181,9 +192,11 @@ def test_run_cli_sets_delete_candidates(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   deletecandidates=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.DELETE_CANDIDATES == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.DELETE_CANDIDATES == True
 
 def test_run_cli_sets_quarantine(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -192,9 +205,11 @@ def test_run_cli_sets_quarantine(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   quarantine=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.USE_QUARANTINE == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.USE_QUARANTINE == True
 
 def test_run_cli_sets_diagnostic_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -203,9 +218,11 @@ def test_run_cli_sets_diagnostic_mode(tmp_path, monkeypatch):
                                   output=str(tmp_path),
                                   diag=True))
     with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
-         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")), \
+         patch(PATCH_INIT, return_value=None):
         run_cli()
-    assert config.DIAGNOSTIC_MODE == True
+    import src.cli.cli_main as cli_mod
+    assert cli_mod.config.DIAGNOSTIC_MODE == True
 
 def test_run_cli_calls_reconciliation(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
