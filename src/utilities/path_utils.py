@@ -1,6 +1,7 @@
 # utilities/path_utils.py
 # System
 import os
+import sys
 import unicodedata
 import hashlib
 
@@ -56,3 +57,21 @@ def file_hash(path: str) -> str:
         return None
 
     return h.hexdigest()
+
+
+# Add to src/utilities/path_utils.py
+
+def resource_path(relative_path: str) -> str:
+    """
+    Get absolute path to resource.
+    Works for both development and PyInstaller --onefile builds.
+    PyInstaller extracts bundled files to sys._MEIPASS at runtime.
+
+    Usage:
+        from utilities.path_utils import resource_path
+        path = resource_path("version_info.txt")
+        path = resource_path("utilities/some_file.txt")
+    """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)

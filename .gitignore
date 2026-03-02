@@ -42,9 +42,9 @@ Quarantine/
 *~
 
 # Generated reports
-*.xlsx
-*.csv
-*.txt
+comparision.xlsx
+comparision.csv
+comparision.txt
 summary.txt
 *.json
 
