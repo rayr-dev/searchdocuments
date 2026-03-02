@@ -1,5 +1,10 @@
+# writers/text_writer.py
+
+# System
 import os
 from datetime import datetime
+
+# Local
 from utilities.logging_setup import diag
 
 def write_text_output(output_dir, matches, mismatched, missing,

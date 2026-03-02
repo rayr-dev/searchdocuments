@@ -1,6 +1,9 @@
 # orchestrator.py
 
+# System
 import os
+
+# Local
 from engine.compare_engine import compare_folders_recursive
 from utilities.logging_setup import diag
 

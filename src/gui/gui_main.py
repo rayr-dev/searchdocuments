@@ -1,25 +1,21 @@
 # gui/gui_main.py
 
-try:
-    # System
-    import os
-    import sys
-    import time
-    import config
-    import logging
+# System
+import os
+import sys
+import time
+import config
+import logging
 
-    #3d Party
-    import tkinter as tk
-    import tkinter.ttk as ttk
-    from tkinter import filedialog, messagebox
+#3d Party
+import tkinter as tk
+import tkinter.ttk as ttk
+from tkinter import filedialog, messagebox
 
-    #local
-    from orchestrator import run_reconciliation
-    from utilities.logging_setup import init_logging, diag
+#local
+from orchestrator import run_reconciliation
+from utilities.logging_setup import init_logging, diag
 
-except ImportError:
-    traceback.print_exc()
-    sys.exit(1) #exit with an error code 1
 
 #Constants
 #TODO: SPLASHTIMER

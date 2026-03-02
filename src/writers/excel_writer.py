@@ -1,7 +1,14 @@
+# writers/excel_writer.py
+
+# System
 import os
 from datetime import datetime
+
+# 3rd Party
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
+
+# Local
 from utilities.logging_setup import diag
 
 def write_excel_output(output_dir, matches, mismatched, missing,

@@ -1,6 +1,10 @@
+# writes/csv_writers.py
+# System
 import os
 import csv
 from datetime import datetime
+
+# Local
 from utilities.logging_setup import diag
 
 def write_csv_output(output_dir, matches, mismatched, missing,

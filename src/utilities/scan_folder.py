@@ -1,4 +1,8 @@
+# utilities/scan_folders.py
+# System
 import os
+
+# Local
 from utilities.logging_setup import diag
 
 def scan_folder(folder, multi=False):

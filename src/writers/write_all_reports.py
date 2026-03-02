@@ -1,4 +1,9 @@
+# writers/writer_all_reports. py
+
+# System
 import os
+
+# Local
 from writers.excel_writer import write_excel_output
 from writers.csv_writer import write_csv_output
 from writers.text_writer import write_text_output

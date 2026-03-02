@@ -1,22 +1,16 @@
 # cli/cli_main.py
 
-try:
-    # System
-    import sys
-    import traceback
-    import argparse
-    import logging
-    import config
-    # 3rd Party
+# System
+import argparse
+import logging
+import config
+# 3rd Party
 
-    #Local
-    from orchestrator import run_reconciliation
-    from utilities.logging_setup import init_logging, diag
-    from writers.summary_writer import print_summary
+#Local
+from orchestrator import run_reconciliation
+from utilities.logging_setup import init_logging, diag
+from writers.summary_writer import print_summary
 
-except ImportError:
-    traceback.print_exc()
-    sys.exit(1)  # exit with an error code 1
 
 def build_parser():
     logging.info("CLI Main: Starting build_parser")

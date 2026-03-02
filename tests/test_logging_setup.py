@@ -47,71 +47,74 @@ def test_init_logging_creates_output_dir(tmp_path):
     init_logging(new_dir)
     assert os.path.exists(new_dir)
 
+# -----------------------------
+# Fix cwd test - close handlers before cleanup
+# -----------------------------
 def test_init_logging_defaults_to_cwd_when_no_output_dir():
     """When no output_dir provided should use current working directory."""
     log_path = init_logging()
     assert os.path.exists(log_path)
     assert os.getcwd() in log_path
-    # Cleanup
+
+    # Close handlers before attempting to delete on Windows
+    for handler in logging.root.handlers[:]:
+        handler.close()
+        logging.root.removeHandler(handler)
+
     if os.path.exists(log_path):
         os.remove(log_path)
 
 # -----------------------------
-# Log level tests
+# Log level tests - read from file instead of caplog
 # -----------------------------
-def test_init_logging_info_level_by_default(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=False)
-    with caplog.at_level(logging.INFO):
-        logging.info("info message")
-    assert "info message" in caplog.text
-
-def test_init_logging_debug_level_when_diagnostic(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=True)
-    with caplog.at_level(logging.DEBUG):
-        logging.debug("debug message")
-    assert "debug message" in caplog.text
-
-def test_init_logging_warning_logged(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=False)
-    with caplog.at_level(logging.WARNING):
-        logging.warning("warning message")
-    assert "warning message" in caplog.text
-
-def test_init_logging_error_logged(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=False)
-    with caplog.at_level(logging.ERROR):
-        logging.error("error message")
-    assert "error message" in caplog.text
-
-def test_init_logging_critical_logged(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=False)
-    with caplog.at_level(logging.CRITICAL):
-        logging.critical("critical message")
-    assert "critical message" in caplog.text
-
-def test_init_logging_debug_suppressed_when_not_diagnostic(tmp_path, caplog):
-    """DEBUG messages should NOT appear when diagnostic=False."""
-    init_logging(str(tmp_path), diagnostic=False)
-    with caplog.at_level(logging.DEBUG):
-        logging.debug("should be suppressed")
-    # caplog captures at DEBUG level but root logger is INFO
-    # so debug message should not appear in log file
-    log_path = [f for f in os.listdir(str(tmp_path)) if f.endswith(".log")][0]
-    content = open(os.path.join(str(tmp_path), log_path)).read()
-    assert "should be suppressed" not in content
-
-def test_init_logging_debug_appears_when_diagnostic(tmp_path):
-    """DEBUG messages SHOULD appear in log file when diagnostic=True."""
-    init_logging(str(tmp_path), diagnostic=True)
-    logging.debug("diagnostic debug message")
-
-    # Flush handlers
+def test_init_logging_info_level_by_default(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=False)
+    logging.info("info message")
     for handler in logging.root.handlers:
         handler.flush()
+    content = open(log_path).read()
+    assert "info message" in content
 
-    log_path = [f for f in os.listdir(str(tmp_path)) if f.endswith(".log")][0]
-    content = open(os.path.join(str(tmp_path), log_path)).read()
-    assert "diagnostic debug message" in content
+def test_init_logging_warning_logged(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=False)
+    logging.warning("warning message")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "warning message" in content
+
+def test_init_logging_error_logged(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=False)
+    logging.error("error message")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "error message" in content
+
+def test_init_logging_critical_logged(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=False)
+    logging.critical("critical message")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "critical message" in content
+
+def test_init_logging_debug_suppressed_when_not_diagnostic(tmp_path):
+    """DEBUG messages should NOT appear in log file when diagnostic=False."""
+    log_path = init_logging(str(tmp_path), diagnostic=False)
+    logging.debug("should be suppressed")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "should be suppressed" not in content
+
+def test_init_logging_debug_level_when_diagnostic(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=True)
+    logging.debug("debug message")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "debug message" in content
 
 def test_init_logging_info_appears_in_log_file(tmp_path):
     """INFO messages should appear in log file."""
@@ -145,11 +148,21 @@ def test_init_logging_sets_debug_level_when_diagnostic(tmp_path):
 # -----------------------------
 # diag() function tests
 # -----------------------------
-def test_diag_logs_at_debug_level(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=True)
-    with caplog.at_level(logging.DEBUG):
-        diag("test diag message")
-    assert "test diag message" in caplog.text
+def test_diag_logs_at_debug_level(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=True)
+    diag("test diag message")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "test diag message" in content
+
+def test_diag_handles_special_characters(tmp_path):
+    log_path = init_logging(str(tmp_path), diagnostic=True)
+    diag("special chars: !@#$%^&*()")
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "special chars" in content
 
 def test_diag_message_appears_in_file_when_diagnostic(tmp_path):
     """diag() output should appear in log file when diagnostic=True."""
@@ -179,12 +192,6 @@ def test_diag_handles_empty_string(tmp_path, caplog):
     init_logging(str(tmp_path), diagnostic=True)
     with caplog.at_level(logging.DEBUG):
         diag("")  # should not raise
-
-def test_diag_handles_special_characters(tmp_path, caplog):
-    init_logging(str(tmp_path), diagnostic=True)
-    with caplog.at_level(logging.DEBUG):
-        diag("special chars: !@#$%^&*()")
-    assert "special chars" in caplog.text
 
 # -----------------------------
 # dump_diagnostics tests
@@ -237,11 +244,13 @@ def test_dump_diagnostics_returns_none_on_error(tmp_path, monkeypatch):
     result = dump_diagnostics({"test": "data"}, str(tmp_path))
     assert result is None
 
-def test_dump_diagnostics_logs_success(tmp_path, caplog):
-    init_logging(str(tmp_path))
-    with caplog.at_level(logging.INFO):
-        dump_diagnostics({"test": "value"}, str(tmp_path))
-    assert "Diagnostic dump written" in caplog.text
+def test_dump_diagnostics_logs_success(tmp_path):
+    log_path = init_logging(str(tmp_path))
+    dump_diagnostics({"test": "value"}, str(tmp_path))
+    for handler in logging.root.handlers:
+        handler.flush()
+    content = open(log_path).read()
+    assert "Diagnostic dump written" in content
 
 def test_dump_diagnostics_handles_nested_data(tmp_path):
     init_logging(str(tmp_path))

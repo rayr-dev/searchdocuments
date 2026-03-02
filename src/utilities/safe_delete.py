@@ -1,6 +1,10 @@
+# utilities/safe_delete.py
+# System
 import os
 import shutil
 import config
+
+# Local
 from utilities.logging_setup import diag
 
 # Safe deleter (respects DRY_RUN)

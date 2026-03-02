@@ -1,26 +1,20 @@
 # engine/compare_engine.py
-try:
-    # System
-    import config
-    import traceback
-    import sys
+# System
+import config
+import traceback
+import sys
 
-    # 3rd Party
+# 3rd Party
 
-    #local
-    from utilities.logging_setup import dump_diagnostics
-    from utilities.scan_folder import dump_scan_results
-    from utilities.path_utils import file_hash
-    from utilities.logging_setup import diag
-    from utilities.output import create_timestamped_folder
-    from utilities.scan_folder import scan_folder
-    from writers.write_all_reports import write_all_reports
-    from writers.summary_writer import print_summary
-
-except ImportError:
-    traceback.print_exc()
-    sys.exit(1) #exit with an error code 1
-
+#local
+from utilities.logging_setup import dump_diagnostics
+from utilities.scan_folder import dump_scan_results
+from utilities.path_utils import file_hash
+from utilities.logging_setup import diag
+from utilities.output import create_timestamped_folder
+from utilities.scan_folder import scan_folder
+from writers.write_all_reports import write_all_reports
+from writers.summary_writer import print_summary
 
 def compare_folders_recursive(folderA, folderB,
                               output_dir,
