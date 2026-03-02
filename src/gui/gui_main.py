@@ -16,10 +16,6 @@ from tkinter import filedialog, messagebox
 from orchestrator import run_reconciliation
 from utilities.logging_setup import init_logging, diag
 
-
-#Constants
-#TODO: SPLASHTIMER
-
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
 # ---------------------------------------------------------
