@@ -1,8 +1,6 @@
 # engine/compare_engine.py
 # System
 import config
-import traceback
-import sys
 
 # 3rd Party
 

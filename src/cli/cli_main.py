@@ -1,6 +1,7 @@
 # cli/cli_main.py
 
 # System
+import sys
 import argparse
 import logging
 import config
@@ -9,17 +10,20 @@ import config
 #Local
 from orchestrator import run_reconciliation
 from utilities.logging_setup import init_logging, diag
-from writers.summary_writer import print_summary
 
 
 def build_parser():
     logging.info("CLI Main: Starting build_parser")
     parser = argparse.ArgumentParser(
-        description="Reconciliation Tool - Command Line Interface"
+        description="Search Documents Tool - Command Line Interface"
     )
 
-    parser.add_argument("folderA", help="Source folder (Folder A)")
-    parser.add_argument("folderB", help="Target folder (Folder B)")
+    parser.add_argument("folderA",
+                        help="Source folder (Folder A)"
+    )
+    parser.add_argument("folderB",
+                        help="Target folder (Folder B)"
+    )
 
     parser.add_argument(
         "-o", "--output",
@@ -86,17 +90,11 @@ def run_cli():
     parser = build_parser()
     args = parser.parse_args()
 
-    # Set config flags
-    config.DIAGNOSTIC_MODE = args.diagnostic
-
     # Initialize logging for CLI
-    log_path = init_logging(args.output_dir, diagnostic=config.DIAGNOSTIC_MODE)
+    log_path = init_logging(args.output,
+                            diagnostic=args.diag
+                            )
     logging.info(f"CLI run started. Log file: {log_path}")
-    logging.info("Logging Info")
-    logging.warning("Warning Info")
-    logging.error("Error info")
-    logging.exception("Exception Info")
-    logging.critical("Critical Info")
 
     # Reset config
     config.initialize_runtime()
@@ -138,11 +136,12 @@ def run_cli():
             progress_callback=None,
             status_callback=None
         )
+        logging.info(f"Reports written to: {args.output}")
+        # Print Summary after successful run
+        print(summary_text)
 
     except Exception as e:
-        logging.info(f"ERROR: {e}")
+        logging.error(f"ERROR: {e}")
         diag(f"CLI ERROR: {e}")
         sys.exit(1)
-    # Print summary once, after successful run
-    logging.info(f"\nReports written to: {args.output}")
-    print_summary(summary_text)
+

@@ -263,3 +263,5 @@ def test_dump_diagnostics_handles_nested_data(tmp_path):
     with open(path) as f:
         loaded = json.load(f)
     assert loaded == data
+
+
