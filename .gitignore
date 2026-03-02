@@ -71,4 +71,4 @@ desktop.ini
 #Python specific
 venv/
 __pycache__/
-.pytest_cache/
+.pytest_cache/dir
