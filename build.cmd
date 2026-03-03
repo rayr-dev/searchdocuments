@@ -71,7 +71,7 @@ pyinstaller --clean --noconfirm ^
     --paths src ^
     --add-data "src\utilities;utilities" ^
     --add-data "src\writers;writers" ^
-    --add-data "src\version_info.txt;." ^
+    --add-data "src\app_version.json;." ^
     --distpath dist ^
     --workpath build ^
     src/cli/cli_main.py
@@ -96,7 +96,7 @@ pyinstaller --clean --noconfirm ^
     --paths src ^
     --add-data "src\utilities;utilities" ^
     --add-data "src\writers;writers" ^
-    --add-data "src\version_info.txt;." ^
+    --add-data "src\app_version.json;." ^
     --distpath dist ^
     --workpath build ^
     src/gui/gui_main.py
