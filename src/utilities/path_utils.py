@@ -86,20 +86,20 @@ def resource_path(relative_path: str) -> str:
 def get_version() -> str:
     """Read version from version_info.txt."""
     try:
-        version_path = resource_path("version_info.txt")
+        version_path = resource_path("app_version.json")
         with open(version_path, "r", encoding="utf-8") as f:
             data = json.load(f)
             diag(f"Version: {data['version']}")
             return data.get("version", "Unknown")
     except Exception as error:
-        logging.error(f"Get Version Excpetion: {sys.exc_info()[0]} - {error}")
+        logging.error(f"Get Version Exception: {error}")
         return "Unknown"
 
 
 def get_version_info() -> dict:
     """Read full version info from version_info.txt."""
     try:
-        version_path = resource_path("version_info.txt")
+        version_path = resource_path("app_version.json")
         with open(version_path, "r", encoding="utf-8") as f:
             diag(f"Version: {f.readline()}")
             return json.load(f)
