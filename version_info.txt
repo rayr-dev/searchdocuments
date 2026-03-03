@@ -1,7 +1,0 @@
-{
-    "version": "1.0.0",
-    "build": "20260301",
-    "author": "Ray Rials",
-    "description": "Search Documents - File Reconciliation Tool",
-    "release": "Production"
-}

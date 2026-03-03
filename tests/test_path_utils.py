@@ -2,6 +2,7 @@
 
 import os
 import pytest
+
 from src.utilities.path_utils import (
     normalize_path,
     ensure_dir,
@@ -197,6 +198,7 @@ def test_get_version_returns_unknown_when_json_invalid(tmp_path, monkeypatch):
 def test_get_version_info_returns_correct_dict(tmp_path, monkeypatch):
     """Should return full version info dict."""
     import json
+    import builtins
     from src.utilities.path_utils import get_version_info
 
     expected = {
@@ -208,10 +210,12 @@ def test_get_version_info_returns_correct_dict(tmp_path, monkeypatch):
     }
 
     version_file = tmp_path / "version_info.txt"
+    print(f"version_file: [{version_file}]")
+    version_file.write_text(json.dumps(expected))
+    original_open = builtins.open
     version_file.write_text(json.dumps(expected))
 
     # Patch builtins.open to return our file
-    import builtins
     original_open = builtins.open
 
     def fake_open(path, *args, **kwargs):

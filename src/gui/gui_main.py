@@ -23,6 +23,7 @@ from utilities.path_utils import get_version, get_version_info
 # CONSTANTS
 # ---------------------------------------------------------
 LABEL_BG_COLOR = "white"
+DEBUG_MODULE = "[gui_main]"
 
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
@@ -33,7 +34,7 @@ def main():
     # Optional PyInstaller splash
     # -----------------------------
     # Only attempts splash if frozen
-    logging.info("GUI_MAIN/main: Beginning GUI entry point")
+    logging.info("{DEBUG_MODULE} main: Beginning GUI entry point")
     if getattr(sys, 'frozen', False):
         try:
             import pyi_splash
@@ -41,7 +42,7 @@ def main():
             time.sleep(1)  # delay in seconds
             pyi_splash.close()
         except Exception as error:
-            logging.error(f"Exception error launching splash screen - [{error}]")
+            logging.error(f"[gui_main] Exception error launching splash screen - [{error}]")
             pass
         # -----------------------------
         # # Step 1 - read version first
