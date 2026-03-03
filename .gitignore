@@ -18,7 +18,6 @@ build/
 dist/
 *.spec
 
-
 # Logs
 *.log
 *.tmp
@@ -41,12 +40,14 @@ Quarantine/
 ~*.*
 *~
 
+# IDE files
+.vscode/
+.idea/
+
 # Generated reports
-comparision.xlsx
-comparision.csv
-comparision.txt
-summary.txt
-*.json
+# Test output
+testdata/reports/
+testdata/debug/
 
 # Executables and installers
 *.exe
@@ -67,6 +68,9 @@ desktop.ini
 
 # PyCharm
 .idea/
+
+# Debug output
+test_debug/
 
 #Python specific
 venv/
