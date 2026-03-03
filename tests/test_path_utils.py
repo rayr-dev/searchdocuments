@@ -126,28 +126,28 @@ def test_file_hash_returns_none_for_missing_file():
 def test_resource_path_in_dev_mode():
     """In dev mode should return path relative to cwd."""
     from src.utilities.path_utils import resource_path
-    result = resource_path("version_info.txt")
-    assert "version_info.txt" in result
+    result = resource_path("app_version.json")
+    assert "app_version.json" in result
 
 def test_resource_path_in_frozen_mode(monkeypatch):
     """In frozen/PyInstaller mode should use sys._MEIPASS."""
     import sys
     from src.utilities.path_utils import resource_path
     monkeypatch.setattr(sys, "_MEIPASS", "/fake/meipass", raising=False)
-    result = resource_path("version_info.txt")
+    result = resource_path("app_version.json")
     # Use os.path.join to handle Windows vs Linux separators
-    assert result == os.path.join("/fake/meipass", "version_info.txt")
+    assert result == os.path.join("/fake/meipass", "app_version.json")
 
 # -----------------------------
 # get_version tests
 # -----------------------------
 def test_get_version_returns_correct_version(tmp_path, monkeypatch):
-    """Should return version string from version_info.txt."""
+    """Should return version string from app_version.json."""
     import json
-    import builtins
     from src.utilities.path_utils import get_version
+    import src.utilities.path_utils as path_utils_module
 
-    version_file = tmp_path / "version_info.txt"
+    version_file = tmp_path / "app_version.json"
     version_file.write_text(json.dumps({
         "version": "1.0.0",
         "build": "20260301",
@@ -156,37 +156,39 @@ def test_get_version_returns_correct_version(tmp_path, monkeypatch):
         "release": "Production"
     }))
 
-    original_open = builtins.open
-
-    def fake_open(path, *args, **kwargs):
-        if "version_info.txt" in str(path):
-            return original_open(str(version_file), *args, **kwargs)
-        return original_open(path, *args, **kwargs)
-
-    monkeypatch.setattr(builtins, "open", fake_open)
+    monkeypatch.setattr(
+        path_utils_module,
+        "resource_path",
+        lambda x: str(version_file)
+    )
 
     result = get_version()
     assert result == "1.0.0"
 
 def test_get_version_returns_unknown_when_file_missing(monkeypatch):
-    """Should return Unknown if version_info.txt not found."""
+    """Should return Unknown if app_version.json not found."""
+    import src.utilities.path_utils as path_utils_module
     from src.utilities.path_utils import get_version
+
     monkeypatch.setattr(
-        "src.utilities.path_utils.resource_path",
-        lambda x: "nonexistent/path/version_info.txt"
+        path_utils_module,
+        "resource_path",
+        lambda x: "nonexistent/path/app_version.json"
     )
     result = get_version()
     assert result == "Unknown"
 
 def test_get_version_returns_unknown_when_json_invalid(tmp_path, monkeypatch):
-    """Should return Unknown if version_info.txt is not valid JSON."""
+    """Should return Unknown if app_version.json is not valid JSON."""
+    import src.utilities.path_utils as path_utils_module
     from src.utilities.path_utils import get_version
 
-    version_file = tmp_path / "version_info.txt"
+    version_file = tmp_path / "app_version.json"
     version_file.write_text("this is not json")
 
     monkeypatch.setattr(
-        "src.utilities.path_utils.resource_path",
+        path_utils_module,
+        "resource_path",
         lambda x: str(version_file)
     )
     result = get_version()
@@ -198,7 +200,7 @@ def test_get_version_returns_unknown_when_json_invalid(tmp_path, monkeypatch):
 def test_get_version_info_returns_correct_dict(tmp_path, monkeypatch):
     """Should return full version info dict."""
     import json
-    import builtins
+    import src.utilities.path_utils as path_utils_module
     from src.utilities.path_utils import get_version_info
 
     expected = {
@@ -209,19 +211,22 @@ def test_get_version_info_returns_correct_dict(tmp_path, monkeypatch):
         "release": "Production"
     }
 
-    version_file = tmp_path / "version_info.txt"
-    print(f"version_file: [{version_file}]")
-    version_file.write_text(json.dumps(expected))
-    original_open = builtins.open
+    version_file = tmp_path / "app_version.json"
     version_file.write_text(json.dumps(expected))
 
-    # Patch builtins.open to return our file
-    original_open = builtins.open
+    monkeypatch.setattr(
+        path_utils_module,
+        "resource_path",
+        lambda x: str(version_file)
+    )
 
-    def fake_open(path, *args, **kwargs):
-        if "version_info.txt" in str(path):
-            return original_open(str(version_file), *args, **kwargs)
-        return original_open(path, *args, **kwargs)
+    result = get_version_info()
+    assert result == expected
+
+def fake_open(path, *args, **kwargs):
+    if "app_version.json" in str(path):
+        return original_open(str(version_file), *args, **kwargs)
+    return original_open(path, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "open", fake_open)
 
@@ -229,11 +234,14 @@ def test_get_version_info_returns_correct_dict(tmp_path, monkeypatch):
     assert result == expected
 
 def test_get_version_info_returns_defaults_when_file_missing(monkeypatch):
-    """Should return default dict if version_info.txt not found."""
+    """Should return default dict if app_version.json not found."""
+    import src.utilities.path_utils as path_utils_module
     from src.utilities.path_utils import get_version_info
+
     monkeypatch.setattr(
-        "src.utilities.path_utils.resource_path",
-        lambda x: "nonexistent/path/version_info.txt"
+        path_utils_module,
+        "resource_path",
+        lambda x: "nonexistent/path/app_version.json"
     )
     result = get_version_info()
     assert result["version"] == "Unknown"
@@ -243,14 +251,16 @@ def test_get_version_info_returns_defaults_when_file_missing(monkeypatch):
     assert result["release"] == "Unknown"
 
 def test_get_version_info_returns_defaults_when_json_invalid(tmp_path, monkeypatch):
-    """Should return defaults if version_info.txt is not valid JSON."""
+    """Should return defaults if app_version.json is not valid JSON."""
+    import src.utilities.path_utils as path_utils_module
     from src.utilities.path_utils import get_version_info
 
-    version_file = tmp_path / "version_info.txt"
+    version_file = tmp_path / "app_version.json"
     version_file.write_text("not valid json")
 
     monkeypatch.setattr(
-        "src.utilities.path_utils.resource_path",
+        path_utils_module,
+        "resource_path",
         lambda x: str(version_file)
     )
     result = get_version_info()

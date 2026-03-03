@@ -81,7 +81,7 @@ def resource_path(relative_path: str) -> str:
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     diag(f"Resource Path: {relative_path}")
-    return os.path.join(os.path.abspath("."), relative_path)
+    return os.path.join(os.path.abspath("src"), relative_path)
 
 def get_version() -> str:
     """Read version from version_info.txt."""
@@ -97,14 +97,14 @@ def get_version() -> str:
 
 
 def get_version_info() -> dict:
-    """Read full version info from version_info.txt."""
+    """"Read full version info from app_version.json."""
     try:
         version_path = resource_path("app_version.json")
         with open(version_path, "r", encoding="utf-8") as f:
-            diag(f"Version: {f.readline()}")
-            return json.load(f)
+            data = json.load(f)                    # ← read entire file at once
+            diag(f"Version info loaded: {data.get('version', 'Unknown')}")
+            return data
     except Exception as error:
-        diag(f"Version: {error}")
         logging.error(f"Version: {error}")
         return {
             "version": "Unknown",
