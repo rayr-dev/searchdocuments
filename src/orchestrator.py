@@ -12,7 +12,7 @@ def run_reconciliation(folderA, folderB, output_dir, progress_callback=None, sta
     # All config flags should already be set by CLI or GUI
 
 
-    diag("ORCHESTRATORY/run_reconciliation: Started")
+    diag("ORCHESTRATOR/run_reconciliation: Started")
     if not folderA or not folderB:
         raise ValueError("Folder A and Folder B must be provided.")
 
@@ -28,8 +28,8 @@ def run_reconciliation(folderA, folderB, output_dir, progress_callback=None, sta
         return_results=True,
         return_summary=True
     )
-    diag("ORCHESTRATORY/run_reconciliation: Ended")
+    diag("ORCHESTRATOR/run_reconciliation: Ended")
     if progress_callback:
         progress_callback(100)
-    logging.info("run_reconciliation commpleted successfully")
+    logging.info("run_reconciliation completed successfully")
     return results, summary_text
