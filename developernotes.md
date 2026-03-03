@@ -252,6 +252,25 @@ pytest -v --cov=src --cov-report=term-missing
 | **Total** | **77%** |
 
 ---
+### Test Data Structure
+
+```
+testdata/
+├── source/
+│   ├── test 1.txt              ← exact match everywhere
+│   ├── test 1 - diff content.txt  ← mismatch everywhere  
+│   ├── test 1 - missing.txt    ← missing from TARGET
+│   ├── test 1 - mixed.txt      ← NEW: match in some, mismatch in others
+│   └── Sub A/
+│       └── test 1.txt
+├── target/
+│   ├── test 1.txt              ← exact match
+│   ├── test 1 - diff content.txt  ← different content
+│   ├── test 1 - mixed.txt      ← NEW: exact match copy
+│   └── Sub A/
+│       ├── test 1.txt          ← exact match
+│       └── test 1 - mixed.txt  ← NEW: different content copy
+```
 
 ## Code Quality
 
@@ -373,7 +392,7 @@ src/version_info.txt
 ```
 
 ### Updating Version
-1. Edit `src/version_info.txt`
+1. Edit `src/app_version.json`
 2. Update build date to today
 3. Run `pytest -v` to confirm tests pass
 4. Run `build.cmd` to create new executables
