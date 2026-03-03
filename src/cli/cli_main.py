@@ -1,11 +1,13 @@
 # cli/cli_main.py
+'''
+The purpose of this module is to process the Search Documents using the CLI Interface.
+'''
 
 # System
 import sys
 import argparse
 import logging
 import config
-# 3rd Party
 
 #Local
 from orchestrator import run_reconciliation
@@ -13,7 +15,7 @@ from utilities.logging_setup import init_logging, diag
 
 
 def build_parser():
-    logging.info("CLI Main: Starting build_parser")
+    diag("CLI_MAIN/build_parser: Starting build_parser")
     parser = argparse.ArgumentParser(
         description="Search Documents Tool - Command Line Interface"
     )
@@ -82,11 +84,12 @@ def build_parser():
         action="store_true",
         help="Enable diagnostic output"
     )
-
+    diag("CLI_MAIN/build_parser: Ending build_parser")
     return parser
 
 
 def run_cli():
+    diag("CLI_MAIN/run_cli: Starting run reconciliation process")
     parser = build_parser()
     args = parser.parse_args()
 
@@ -94,7 +97,7 @@ def run_cli():
     log_path = init_logging(args.output,
                             diagnostic=args.diag
                             )
-    logging.info(f"CLI run started. Log file: {log_path}")
+    diag(f"Log file: {log_path}")
 
     # Reset config
     config.initialize_runtime()
@@ -116,7 +119,7 @@ def run_cli():
     # Diagnostics
     config.DIAGNOSTIC_MODE = args.diag
 
-    diag("CLI invoked")
+    diag("RUN_CLI arguments before run_reconciliation")
     diag(f"FolderA: {args.folderA}")
     diag(f"FolderB: {args.folderB}")
     diag(f"Output: {args.output}")
@@ -140,8 +143,9 @@ def run_cli():
         # Print Summary after successful run
         print(summary_text)
 
-    except Exception as e:
-        logging.error(f"ERROR: {e}")
-        diag(f"CLI ERROR: {e}")
+    except Exception as error:
+        logging.error(f"Exception Error from run_reconciliation: {error}")
+        diag(f"Exception Error from run_reconciliation: {error}")
         sys.exit(1)
 
+    diag("CLI_MAIN/run_cli: End run reconciliation process")

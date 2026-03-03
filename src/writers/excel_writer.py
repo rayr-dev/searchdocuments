@@ -2,6 +2,7 @@
 
 # System
 import os
+import logging
 from datetime import datetime
 
 # 3rd Party
@@ -16,7 +17,9 @@ def write_excel_output(output_dir, matches, mismatched, missing,
 
 
 
+    diag("EXCEL_WRITER/write_excel_output Starting")
     excel_path = os.path.join(output_dir, "comparison.xlsx")
+    diag(f"Excel Path: {excel_path}")
 
     # Optional: writer-level status update
     if status_callback:
@@ -129,6 +132,6 @@ def write_excel_output(output_dir, matches, mismatched, missing,
 
         wb.save(excel_path)
         diag("Checkpoint After Save")
-    except Exception as e:
-        diag(f"ERROR writing Excel report: {e}")
-        print(f"ERROR writing Excel report: {e}")
+    except Exception as error:
+        diag(f"ERROR writing Excel report: {error}")
+        logging.error(f"ERROR writing Excel report: {error}")

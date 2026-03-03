@@ -2,19 +2,16 @@
 
 # System
 import os
+import traceback
 from datetime import datetime
 import logging
-
-# 3rd Party
-
-# Local
 
 def init_logging(output_dir=None, diagnostic=False):
     """
     Initializes logging for both CLI and GUI modes.
     If output_dir is provided, logs go there. Otherwise, logs go to cwd.
     """
-
+    diag("LOGGING_SETUP/init_logging: Started")
     # Ensure directory exists
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
@@ -39,7 +36,7 @@ def init_logging(output_dir=None, diagnostic=False):
         ]
     )
 
-    logging.info("Logging initialized.")
+    diag("LOGGING_SETUP/init_logging: Ended")
     return log_path
 
 def dump_diagnostics(data, output_dir, filename="diagnostics_dump.json"):
@@ -55,13 +52,13 @@ def dump_diagnostics(data, output_dir, filename="diagnostics_dump.json"):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
-        logging.info(f"Diagnostic dump written: {path}")
+        diag(f"Diagnostic dump written: {path}")
         return path
 
-    except Exception:
-        logging.exception("Failed to write diagnostic dump.")
+    except Exception as error:
+        diag(f"ERROR writing diagnostics: {traceback.format_exc()}-{error}")
+        logging.error("Writing diagnostic file error: {traceback.format_exc()}-error}")
         return None
-
 
 def diag(msg):
     logging.debug(msg)

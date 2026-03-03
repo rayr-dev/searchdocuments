@@ -2,10 +2,15 @@
 #
 # System
 import os
+import logging
+
+# Local
+from utilities.logging_setup import diag
 
 
 def build_summary(output_dir, matches, mismatched, missing,
                   progress_callback=None, status_callback=None):
+    diag("SUMMARY_WRITER/build_summary Starting")
     summary_path = os.path.join(output_dir, "summary.txt")
 
     if status_callback:
@@ -44,11 +49,15 @@ def build_summary(output_dir, matches, mismatched, missing,
     if status_callback:
         status_callback("Summary report written.")
 
+    diag("SUMMARY_WRITER/build_summary Ending")
+
 
 def print_summary(matches, mismatched, missing, status_callback=None):
     total_matches = len(matches)
     total_mismatches = len(mismatched)
     total_missing = len(missing)
+    logging.info("SUMMARY_WRITER/print_summary Starting")
+    diag(f"Print Summary total matches: {total_matches} - total mismatches: {total_mismatches} - total missing: {total_missing}")
 
     from collections import Counter
     match_names = [name for name, _, _ in matches]
@@ -70,5 +79,5 @@ def print_summary(matches, mismatched, missing, status_callback=None):
     ]
 
     summary_text = "\n".join(summary)
-
+    diag("SUMMARY_WRITER/print_summary Ending")
     return summary_text

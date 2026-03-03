@@ -15,8 +15,8 @@ def scan_folder(folder, multi=False):
             try:
                 size = os.path.getsize(full_path)
                 mtime = os.path.getmtime(full_path)
-            except Exception as e:
-                diag(f"SCAN: Skipping unreadable file: {full_path} ({e})")
+            except Exception as error:
+                diag(f"SCAN: Skipping unreadable file: {full_path} ({error})")
                 continue
 
             if multi:
@@ -46,3 +46,4 @@ def dump_scan_results(filesA, filesB):
             print(f"    {entry}")
 
     print("\n==============================================\n")
+    diag("Dump Scan Results: ")

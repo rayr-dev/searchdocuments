@@ -1,8 +1,16 @@
 # engine/compare_engine.py
+'''
+The purpose performs the business logic layer to perform the comparison and returns:
+results = {
+    "matches" : matches,
+    "mismatched" : mismatched,
+    "missing" : missing
+    }
+    Summary_text is the output summary to display in the UI layers.
+'''
+
 # System
 import config
-
-# 3rd Party
 
 #local
 from utilities.logging_setup import dump_diagnostics
@@ -22,8 +30,7 @@ def compare_folders_recursive(folderA, folderB,
                               return_results=True,
                               return_summary=True
                               ):
-
-    diag("Compare Engine: Starting run compare_folders_recursive")
+    diag("COMPARE_ENGINE/compare_folders_recursive: Starting compare_folders_recursive")
     # Apply timestamped output behavior ONCE
     if config.TIMESTAMPED_OUTPUT:
         output_dir = create_timestamped_folder(output_dir)
@@ -152,7 +159,7 @@ def compare_folders_recursive(folderA, folderB,
         "mismatched": mismatched,
         "missing": missing
     }
-
+    diag("COMPARE_ENGINE/compare_folders_recursive: Ending compare_folders_recursive")
     # Build Summary Report
     summary_text = print_summary(matches, mismatched, missing, status_callback)
     return results, summary_text

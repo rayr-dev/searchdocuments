@@ -2,7 +2,10 @@
 # System
 import os
 import csv
+import logging
+
 from datetime import datetime
+
 
 # Local
 from utilities.logging_setup import diag
@@ -10,6 +13,7 @@ from utilities.logging_setup import diag
 def write_csv_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):
 
+    diag("CSV_WRITER/write_csv_output")
     csv_path = os.path.join(output_dir, "comparison.csv")
 
     if status_callback:
@@ -89,4 +93,5 @@ def write_csv_output(output_dir, matches, mismatched, missing,
                 writer.writerow(["Missing in Folder B", name, pathA, tsA, "", ""])
     except Exception as e:
         diag(f"ERROR writing CSV report: {e}")
-        print(f"ERROR writing CSV report: {e}")
+        logging.error(f"Error writing CSV report {csv_path} - Exception: {e}")
+    diag("CSV_WRITER/write_csv_output ending")

@@ -9,10 +9,9 @@ from utilities.logging_setup import diag
 
 def write_text_output(output_dir, matches, mismatched, missing,
                        progress_callback=None, status_callback=None):
-
-
-
+    diag("TEXT_WRITER/write_text_output Starting")
     txt_path = os.path.join(output_dir, "comparison.txt")
+    diag(f"Writing comparison report: {txt_path}")
 
     # Optional: writer-level status update
     if status_callback:
@@ -88,5 +87,6 @@ def write_text_output(output_dir, matches, mismatched, missing,
 
                 f.write(f"{name}\n")
                 f.write(f"  A: {pathA}\n\n")
-    except Exception as e:
-        diag(f"ERROR writing Text report: {e}")
+    except Exception as error:
+        diag(f"ERROR writing Text report: {error}")
+    diag("TEXT_WRITER/write_text_output Ending")

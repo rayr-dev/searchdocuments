@@ -1,4 +1,7 @@
 # gui/gui_main.py
+'''
+The purpose of this module is to process the Search Documents using the GUI Interface.
+'''
 
 # System
 import os
@@ -17,6 +20,7 @@ from orchestrator import run_reconciliation
 from utilities.logging_setup import init_logging, diag
 from utilities.path_utils import get_version, get_version_info
 
+LABEL_BG_COLOR = "white"
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
 # ---------------------------------------------------------
@@ -26,7 +30,7 @@ def main():
     # Optional PyInstaller splash
     # -----------------------------
     # Only attempts splash if frozen
-
+    diag("GUI_MAIN/main: Beginning GUI entry point")
     if getattr(sys, 'frozen', False):
         try:
             import pyi_splash
@@ -80,6 +84,7 @@ def launch_gui(root, info):
             f"Release:     {info['release']}\n"
         )
         messagebox.showinfo("About Search Documents", about_text)
+        diag("SHOW_ABOUT about box {about_text}")
 
     help_menu = tk.Menu(menubar, tearoff=0)
     help_menu.add_command(label="About", command=show_about)
@@ -126,7 +131,7 @@ def launch_gui(root, info):
     tk.Label(
         root,
         text="Output Folder:",
-        bg="white",
+        bg=LABEL_BG_COLOR,
         font=("Segoe UI", 10, "bold")
     ).pack(anchor="w",
            padx=20)
@@ -151,7 +156,7 @@ def launch_gui(root, info):
     tk.Label(
         root,
         text="Folder A (Source):",
-        bg="white",
+        bg=LABEL_BG_COLOR,
         font=("Segoe UI", 10, "bold")
     ).pack(anchor="w",
            padx=20)
@@ -172,7 +177,7 @@ def launch_gui(root, info):
     # -----------------------------
     tk.Label(root,
              text="Folder B (Target):",
-             bg="white",
+             bg=LABEL_BG_COLOR,
              font=("Segoe UI", 10, "bold")
              ).pack(anchor="w",
                     padx=20)
@@ -193,25 +198,25 @@ def launch_gui(root, info):
     # -----------------------------
     tk.Label(root,
              text="Comparison Options:",
-             bg="white",
+             bg=LABEL_BG_COLOR,
              font=("Segoe UI", 10, "bold")).pack(anchor="w",
                                                  padx=20)
 
     tk.Radiobutton(root,
                    text="Timestamp Comparison(Fastest)",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=compare_mode_var,
                    value="timestamp").pack(anchor="w",
                                            padx=40)
     tk.Radiobutton(root,
                    text="Hash Comparison(Accurate Slower)",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=compare_mode_var,
                    value="hash").pack(anchor="w",
                                       padx=40)
     tk.Radiobutton(root,
                    text="Hash-Only Mode (Accurate Moderate speed)",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=compare_mode_var, value="hashonly").pack(anchor="w",
                                                                      padx=40)
 
@@ -222,11 +227,11 @@ def launch_gui(root, info):
     # -----------------------------
     tk.Label(root,
              text="Find All Files (multiple files is Source location:",
-             bg="white",
+             bg=LABEL_BG_COLOR,
              font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
 
     tk.Checkbutton(root, text="Find All Files",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=find_all_var).pack(anchor="w",
                                              padx=40)
 
@@ -237,28 +242,28 @@ def launch_gui(root, info):
     # -----------------------------
     tk.Label(root,
              text="Cleanup Options:",
-             bg="white",
+             bg=LABEL_BG_COLOR,
              font=("Segoe UI",
                    10,
                    "bold")).pack(anchor="w", padx=20)
 
     tk.Checkbutton(root, text="Dry Run (No Changes Made)",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=dryrun_var).pack(anchor="w",
                                              padx=40)
 
     tk.Checkbutton(root, text="Delete Exact Matches",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=deletematches_var).pack(anchor="w",
                                                     padx=40)
 
     tk.Checkbutton(root, text="Delete Mismatch Candidates",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=deletecandidates_var).pack(anchor="w",
                                                        padx=40)
 
     tk.Checkbutton(root, text="Use Quarantine Folder",
-                   bg="white",
+                   bg=LABEL_BG_COLOR,
                    variable=quarantine_var).pack(anchor="w",
                                                  padx=40)
 
@@ -270,7 +275,7 @@ def launch_gui(root, info):
     tk.Label(
         root,
         text="Output Detail Level:",
-        bg="white",
+        bg=LABEL_BG_COLOR,
         font=("Segoe UI", 10, "bold")
     ).pack(anchor="w",
            padx=20)
@@ -278,7 +283,7 @@ def launch_gui(root, info):
     tk.Checkbutton(
         root,
         text="Diagnostic Output",
-        bg="white",
+        bg=LABEL_BG_COLOR,
         variable=diagnostics_var
     ).pack(anchor="w",
            padx=20,
@@ -290,7 +295,7 @@ def launch_gui(root, info):
     status_label = tk.Label(root,
                             text="Status: Ready",
                             anchor="w",
-                            bg="white",
+                            bg=LABEL_BG_COLOR,
                             font=("Segoe UI", 10),
                             relief="sunken",
                             borderwidth=1,)
@@ -333,11 +338,11 @@ def launch_gui(root, info):
     def run_clicked():
 
         try:
-            print(f"Run clicked - FolderA: {folderA_var.get()}")
-            print(f"FolderB: {folderB_var.get()}")
-            print(f"Output: {output_dir_var.get()}")
-        except Exception as e:
-            print(f"Early error: {e}")
+            diag(f"Run clicked - FolderA: {folderA_var.get()}")
+            diag(f"FolderB: {folderB_var.get()}")
+            diag(f"Output: {output_dir_var.get()}")
+        except Exception as error:
+            logging.error(f"Early error: {error}")
 
         folderA = folderA_var.get()
         folderB = folderB_var.get()
@@ -387,10 +392,10 @@ def launch_gui(root, info):
             set_status("Summary ready.")
             messagebox.showinfo("Done", "Comparison complete. Output files created.")
 
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred:\n{e}")
-            logging.error(f"GUI ERROR: {e}")
-            diag(f"GUI ERROR: {e}")
+        except Exception as error:
+            messagebox.showerror("Error", f"An error occurred:\n{error}")
+            logging.error(f"GUI ERROR: {error}")
+            diag(f"GUI ERROR: {error}")
 
     # ---------------------------------------------------------
     # VALIDATION FUNCTION (placed here so it sees all widgets)
@@ -451,7 +456,7 @@ def launch_gui(root, info):
     # -----------------------------
     tk.Label(root,
              text="Summary:",
-             bg="white",
+             bg=LABEL_BG_COLOR,
              font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
 
     summary_frame = tk.Frame(root)
@@ -473,7 +478,7 @@ def launch_gui(root, info):
 
     scrollbar.config(command=summary_box.yview)
 
-
+    diag("GUI_MAIN/main: Ending GUI entry point")
     root.mainloop()
 
 # ---------------------------------------------------------
