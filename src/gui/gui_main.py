@@ -19,8 +19,11 @@ from tkinter import filedialog, messagebox
 from orchestrator import run_reconciliation
 from utilities.logging_setup import init_logging, diag
 from utilities.path_utils import get_version, get_version_info
-
+# ---------------------------------------------------------
+# CONSTANTS
+# ---------------------------------------------------------
 LABEL_BG_COLOR = "white"
+
 # ---------------------------------------------------------
 # MAIN ENTRY POINT
 # ---------------------------------------------------------
@@ -30,14 +33,15 @@ def main():
     # Optional PyInstaller splash
     # -----------------------------
     # Only attempts splash if frozen
-    diag("GUI_MAIN/main: Beginning GUI entry point")
+    logging.info("GUI_MAIN/main: Beginning GUI entry point")
     if getattr(sys, 'frozen', False):
         try:
             import pyi_splash
             pyi_splash.update_text("Loading GUI...")
             time.sleep(1)  # delay in seconds
             pyi_splash.close()
-        except Exception:
+        except Exception as error:
+            logging.error(f"Exception error launching splash screen - [{error}]")
             pass
         # -----------------------------
         # # Step 1 - read version first
@@ -45,8 +49,7 @@ def main():
 
     version = get_version()
     info = get_version_info()
-
-    diag("GUI Main: Starting launch gui")
+    diag(f"Version Information: Version Info [{info}]")
 
     # -----------------------------
     # Main Window
@@ -84,7 +87,7 @@ def launch_gui(root, info):
             f"Release:     {info['release']}\n"
         )
         messagebox.showinfo("About Search Documents", about_text)
-        diag("SHOW_ABOUT about box {about_text}")
+        diag(f"SHOW_ABOUT about box {about_text}")
 
     help_menu = tk.Menu(menubar, tearoff=0)
     help_menu.add_command(label="About", command=show_about)
@@ -316,7 +319,8 @@ def launch_gui(root, info):
                                    )
     progress_bar.pack(fill="x",
                       padx=20,
-                      pady=(0, 10))
+                      pady=(0, 10)
+                      )
 
     def set_progress(value):
         progress_var.set(value)
@@ -338,11 +342,11 @@ def launch_gui(root, info):
     def run_clicked():
 
         try:
-            diag(f"Run clicked - FolderA: {folderA_var.get()}")
-            diag(f"FolderB: {folderB_var.get()}")
-            diag(f"Output: {output_dir_var.get()}")
+            diag(f"Run clicked - FolderA: [{folderA_var.get()}]")
+            diag(f"FolderB: [{folderB_var.get()}]")
+            diag(f"Output: [{output_dir_var.get()}]")
         except Exception as error:
-            logging.error(f"Early error: {error}")
+            logging.error(f"Early error: [{error}]")
 
         folderA = folderA_var.get()
         folderB = folderB_var.get()
@@ -364,15 +368,15 @@ def launch_gui(root, info):
         log_path = init_logging(output_dir, diagnostic=config.DIAGNOSTIC_MODE)
         logging.info(f"GUI Log file created: {log_path}")
         diag("Run button clicked")
-        diag(f"FolderA: {folderA}")
-        diag(f"FolderB: {folderB}")
-        diag(f"Output: {output_dir}")
-        diag(f"Mode: {mode}")
-        diag(f"Dry Run: {config.DRY_RUN}")
-        diag(f"Exact Matches: {config.HASH_ONLY_MODE}")
-        diag(f"Delete Candidates: {config.DELETE_CANDIDATES}")
-        diag(f"Quarantine: {config.USE_QUARANTINE}")
-        diag(f"Find All Files: {config.FIND_ALL_LOCATIONS_MODE}")
+        diag(f"FolderA: [{folderA}]")
+        diag(f"FolderB: [{folderB}]")
+        diag(f"Output: [{output_dir}]")
+        diag(f"Mode: [{mode}]")
+        diag(f"Dry Run: [{config.DRY_RUN}]")
+        diag(f"Exact Matches: [{config.HASH_ONLY_MODE}]")
+        diag(f"Delete Candidates: [{config.DELETE_CANDIDATES}]")
+        diag(f"Quarantine: [{config.USE_QUARANTINE}]")
+        diag(f"Find All Files: [{config.FIND_ALL_LOCATIONS_MODE}]")
 
         try:
             set_status("Starting comparison...")
@@ -394,8 +398,8 @@ def launch_gui(root, info):
 
         except Exception as error:
             messagebox.showerror("Error", f"An error occurred:\n{error}")
-            logging.error(f"GUI ERROR: {error}")
-            diag(f"GUI ERROR: {error}")
+            logging.error(f"GUI ERROR: [{error}]")
+            diag(f"GUI ERROR: [{error}]")
 
     # ---------------------------------------------------------
     # VALIDATION FUNCTION (placed here so it sees all widgets)
@@ -418,8 +422,6 @@ def launch_gui(root, info):
     folderA_var.trace_add("write", validate_all_paths)
     folderB_var.trace_add("write", validate_all_paths)
     output_dir_var.trace_add("write", validate_all_paths)
-
-
 
     # ---------------------------------------------------------
     # Bind validation to typing + focus loss
@@ -478,7 +480,6 @@ def launch_gui(root, info):
 
     scrollbar.config(command=summary_box.yview)
 
-    diag("GUI_MAIN/main: Ending GUI entry point")
     root.mainloop()
 
 # ---------------------------------------------------------

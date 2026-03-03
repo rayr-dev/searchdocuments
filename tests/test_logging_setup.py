@@ -245,11 +245,11 @@ def test_dump_diagnostics_returns_none_on_error(tmp_path, monkeypatch):
     assert result is None
 
 def test_dump_diagnostics_logs_success(tmp_path):
-    log_path = init_logging(str(tmp_path))
+    log_path = init_logging(str(tmp_path), diagnostic=True)  # ← enable debug
     dump_diagnostics({"test": "value"}, str(tmp_path))
     for handler in logging.root.handlers:
         handler.flush()
-    content = open(log_path).read()
+    content = open(log_path, encoding="utf-8").read()
     assert "Diagnostic dump written" in content
 
 def test_dump_diagnostics_handles_nested_data(tmp_path):

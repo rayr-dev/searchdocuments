@@ -2,7 +2,6 @@
 
 # System
 import os
-import traceback
 from datetime import datetime
 import logging
 
@@ -56,8 +55,7 @@ def dump_diagnostics(data, output_dir, filename="diagnostics_dump.json"):
         return path
 
     except Exception as error:
-        diag(f"ERROR writing diagnostics: {traceback.format_exc()}-{error}")
-        logging.error("Writing diagnostic file error: {traceback.format_exc()}-error}")
+        logging.info(f"Failed to write diagnostic dump.-[{error}]") # Keep logging for Unit Testing
         return None
 
 def diag(msg):
