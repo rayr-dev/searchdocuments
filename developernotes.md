@@ -268,6 +268,131 @@ ruff check src/ tests/
 ruff check src/ --fix
 ```
 ## Testing Conventions
+### Specific Topics Relevant to Unit Testing
+|Topic | What Used for | Reference |
+|------|---------------|-----------|
+| MagicMock | Status/progress callbacks | unittest.mock docs |
+| patch |Replacing writers, reconciliation| Real Python mock article|
+| side_effect| Simulating exceptions| unittest.mock docs|
+| return_value | Controlling mock output | unittest.mock docs|
+| monkeypatch | sys.argv, config flags | pytest docs|
+| tmp_path | Temporary file creation | pytest docs|
+| caplog | Log message capture | pytest docs|
+ | capsys | stdout/stderr capture | pytest docs|
+
+### Key Concepts to Focus On:
+MagicMock vs Mock:
+
+MagicMock supports magic methods like __len__, __str__
+### Use MagicMock by default unless you have a specific reason not to
+```bash
+status_mock = MagicMock()
+status_mock("some message")
+assert status_mock.called
+assert status_mock.call_count == 1
+print(status_mock.call_args_list)  # see all calls
+patch as context manager vs decorator:
+```
+### patch as context manager vs decorator:
+#### Context manager - what you use most
+```bash
+with patch("src.writers.write_all_reports.build_summary",
+           return_value=None) as mock_summary:
+    write_all_reports(...)
+    assert mock_summary.called
+# Decorator - alternative approach
+@patch("src.writers.write_all_reports.build_summary")
+def test_something(mock_summary):
+    mock_summary.return_value = None
+    write_all_reports(...)
+````
+
+### side_effect for exceptions:
+``` bash
+# Force an exception
+with patch("src.writers.write_all_reports.build_summary",
+           side_effect=Exception("failed")):
+    write_all_reports(...)  # exception is raised inside
+# side_effect with a function
+
+def custom_behavior(*args, **kwargs):
+    if args[0] == "bad_input":
+        raise ValueError("bad!")
+    return "ok"
+
+with patch("some.function", side_effect=custom_behavior):
+    ...
+```
+
+### monkeypatch vs patch:
+``` bash
+# monkeypatch - pytest native, auto resets after test
+def test_something(monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["cli", "folderA", "folderB", "-o", "out"])
+    monkeypatch.setattr(config, "DRY_RUN", True)
+
+# patch - unittest.mock, use as context manager or decorator
+with patch("src.config.DRY_RUN", True):
+    ...
+```
+
+### call_args_list — inspecting mock calls:
+``` bash
+status_mock = MagicMock()
+status_mock("first message")
+status_mock("second message")
+
+# Get all calls
+calls = [c[0][0] for c in status_mock.call_args_list]
+# calls = ["first message", "second message"]
+
+# Check last call
+last_call = status_mock.call_args_list[-1][0][0]
+assert "Reports written to" in last_call
+
+# Check any call
+assert any("ERROR" in c.upper() for c in calls)
+```
+
+### Recommended Reading Order:
+
+Real Python pytest guide — understand fixtures first
+Real Python mock article — understand patch and MagicMock
+Official unittest.mock docs — reference when you need details
+pytest fixtures docs — deep dive into tmp_path, monkeypatch, caplog
+
+### Patterns Used in Your Codebase — Quick Reference:
+#### Pattern 1 - Mock callback and verify calls
+status_mock = MagicMock()
+write_all_reports(..., status_callback=status_mock)
+assert status_mock.called
+calls = [c[0][0] for c in status_mock.call_args_list]
+assert any("ERROR" in c.upper() for c in calls)
+
+#### Pattern 2 - Patch writer to isolate test
+with patch(PATCH_EXCEL, return_value=None) as mock_excel:
+    write_all_reports(...)
+assert mock_excel.called
+
+#### Pattern 3 - Force exception to test error handling
+with patch(PATCH_EXCEL, side_effect=Exception("failed")):
+    write_all_reports(...)  # should not raise
+
+#### Pattern 4 - Monkeypatch sys.argv for CLI tests
+monkeypatch.setattr(sys, "argv", ["cli", "folderA", "folderB", "-o", "out"])
+run_cli()
+
+#### Pattern 5 - tmp_path for file operations
+def test_something(tmp_path):
+    test_file = tmp_path / "test.txt"
+    test_file.write_text("content")
+    assert test_file.exists()
+
+#### Pattern 6 - caplog for log message capture
+def test_logging(caplog):
+    with caplog.at_level(logging.INFO):
+        some_function()
+    assert "expected message" in caplog.text
 
 ### Error Message Assertions
 - Use precise text matching for user facing messages that must be exact
@@ -275,10 +400,22 @@ ruff check src/ --fix
 - Avoid asserting diag() message text in tests
 - Avoid asserting logging.debug() message text in tests
 
+### Updating Output Format
+When changing any user facing output text such as report titles,
+status messages or summary labels always run:
+
+    findstr /s /n "old text" tests\*.py
+
+to find all test assertions that reference the old text before
+committing. Stale assertions will pass in isolation but fail
+in the full suite due to test ordering.
+
 ### General Principles
 - Test behavior not implementation
 - Test what the user or caller experiences
 - Avoid brittle dependencies on internal message wording
+
+
 
 ## Test Data
 ## Test Data Structure
