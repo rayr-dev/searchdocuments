@@ -22,7 +22,8 @@ from utilities.scan_folder import scan_folder
 from writers.write_all_reports import write_all_reports
 from writers.summary_writer import print_summary
 
-def compare_folders_recursive(folderA, folderB,
+def compare_folders_recursive(folderA,
+                              folderB,
                               output_dir,
                               progress_callback=None,
                               status_callback=None,
@@ -146,6 +147,8 @@ def compare_folders_recursive(folderA, folderB,
         matches,
         mismatched,
         missing,
+        source_count=len(filesA),
+        target_count=len(filesB),
         status_callback=status_callback,
         progress_callback=progress_callback
     )
@@ -157,9 +160,18 @@ def compare_folders_recursive(folderA, folderB,
     results = {
         "matches": matches,
         "mismatched": mismatched,
-        "missing": missing
+        "missing": missing,
+        "source_count" : len(filesA),
+        "target_count" : len(filesB)
     }
     diag("COMPARE_ENGINE/compare_folders_recursive: Ending compare_folders_recursive")
     # Build Summary Report
-    summary_text = print_summary(matches, mismatched, missing, status_callback)
+    summary_text = print_summary(
+        matches,
+        mismatched,
+        missing,
+        source_count=len(filesA),
+        target_count=len(filesB),
+        status_callback=status_callback
+    )
     return results, summary_text

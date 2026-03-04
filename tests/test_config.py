@@ -18,7 +18,7 @@ def test_default_diag_writers():
     assert config.DIAG_WRITERS == False
 
 def test_default_find_all_locations_mode():
-    assert config.FIND_ALL_LOCATIONS_MODE == False
+    assert config.FIND_ALL_LOCATIONS_MODE == True
 
 def test_default_timestamped_output():
     assert config.TIMESTAMPED_OUTPUT == True
@@ -85,7 +85,7 @@ def test_initialize_runtime_resets_delete_candidates():
 def test_initialize_runtime_resets_find_all_locations():
     config.FIND_ALL_LOCATIONS_MODE = True
     config.initialize_runtime()
-    assert config.FIND_ALL_LOCATIONS_MODE == False
+    assert config.FIND_ALL_LOCATIONS_MODE == True
 
 def test_initialize_runtime_resets_timestamped_output():
     config.TIMESTAMPED_OUTPUT = False
@@ -121,7 +121,7 @@ def test_initialize_runtime_resets_all_at_once():
     config.USE_QUARANTINE = True
     config.DELETE_EXACT_MATCHES = True
     config.DELETE_CANDIDATES = True
-    config.FIND_ALL_LOCATIONS_MODE = True
+    config.FIND_ALL_LOCATIONS_MODE = False
     config.SILENT_MODE = True
     config.DIAG_SCAN = True
     config.DIAG_COMPARE = True
@@ -136,7 +136,7 @@ def test_initialize_runtime_resets_all_at_once():
     assert config.USE_QUARANTINE == False
     assert config.DELETE_EXACT_MATCHES == False
     assert config.DELETE_CANDIDATES == False
-    assert config.FIND_ALL_LOCATIONS_MODE == False
+    assert config.FIND_ALL_LOCATIONS_MODE == True
     assert config.SILENT_MODE == False
     assert config.DIAG_SCAN == False
     assert config.DIAG_COMPARE == False

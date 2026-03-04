@@ -49,6 +49,7 @@ Quarantine/
 testdata/reports/
 testdata/debug/
 
+
 # JSON exception for app version
 *.json
 !src/app_version.json

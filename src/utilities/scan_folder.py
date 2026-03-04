@@ -33,6 +33,8 @@ def scan_folder(folder, multi=False):
 
 def dump_scan_results(filesA, filesB):
     print("\n================ SCAN RESULTS ================")
+    diag(f"Scan Source files = {len(filesA)}")
+    diag(f"Scan Target files = {len(filesB)}")
 
     print("\n--- FILES A ---")
     for key, value in filesA.items():

@@ -12,7 +12,7 @@ DIAG_COMPARE = False
 DIAG_WRITERS = False
 
 # Compare Behavior
-FIND_ALL_LOCATIONS_MODE = False
+FIND_ALL_LOCATIONS_MODE = True
 
 #Output Behavior
 TIMESTAMPED_OUTPUT = True   # Suppress all console output
@@ -27,9 +27,6 @@ DRY_RUN = False
 USE_QUARANTINE = False
 DELETE_EXACT_MATCHES = False
 DELETE_CANDIDATES = False
-
-DIAGNOSTIC_MODE = False
-
 
 def initialize_runtime():
     """Reset all runtime flags to their default values."""
@@ -48,7 +45,7 @@ def initialize_runtime():
     DIAG_WRITERS = False
 
     # Comparison behavior
-    FIND_ALL_LOCATIONS_MODE = False
+    FIND_ALL_LOCATIONS_MODE = True
 
     # Hash modes
     HASH_COMPARE_MODE = False

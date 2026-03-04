@@ -199,3 +199,27 @@ def test_output_dir_failure_reports_status(tmp_path, monkeypatch):
                          status_callback=status_mock)
     calls = [c[0][0] for c in status_mock.call_args_list]
     assert any("ERROR" in c for c in calls)
+
+def test_summary_failure_does_not_stop_final_status(tmp_path):
+    """If Summary writer fails final status should still be reported."""
+    status_mock = MagicMock()
+    with patch(PATCH_EXCEL,   return_value=None), \
+         patch(PATCH_CSV,     return_value=None), \
+         patch(PATCH_TEXT,    return_value=None), \
+         patch(PATCH_SUMMARY, side_effect=Exception("Summary failed")):
+        write_all_reports(str(tmp_path), [], [], [],
+                         status_callback=status_mock)
+    calls = [c[0][0] for c in status_mock.call_args_list]
+    assert any("Reports written to" in c for c in calls)
+
+def test_summary_failure_reports_status(tmp_path):
+    """Summary failure should report error via status callback."""
+    status_mock = MagicMock()
+    with patch(PATCH_EXCEL,   return_value=None), \
+         patch(PATCH_CSV,     return_value=None), \
+         patch(PATCH_TEXT,    return_value=None), \
+         patch(PATCH_SUMMARY, side_effect=Exception("Summary failed")):
+        write_all_reports(str(tmp_path), [], [], [],
+                         status_callback=status_mock)
+    calls = [c[0][0] for c in status_mock.call_args_list]
+    assert any("Error writing Summary" in c for c in calls)

@@ -252,26 +252,8 @@ pytest -v --cov=src --cov-report=term-missing
 | **Total** | **77%** |
 
 ---
-### Test Data Structure
-
-```
-testdata/
-├── source/
-│   ├── test 1.txt              ← exact match everywhere
-│   ├── test 1 - diff content.txt  ← mismatch everywhere  
-│   ├── test 1 - missing.txt    ← missing from TARGET
-│   ├── test 1 - mixed.txt      ← NEW: match in some, mismatch in others
-│   └── Sub A/
-│       └── test 1.txt
-├── target/
-│   ├── test 1.txt              ← exact match
-│   ├── test 1 - diff content.txt  ← different content
-│   ├── test 1 - mixed.txt      ← NEW: exact match copy
-│   └── Sub A/
-│       ├── test 1.txt          ← exact match
-│       └── test 1 - mixed.txt  ← NEW: different content copy
-```
-
+Current Coverage Status
+---
 ## Code Quality
 
 ### Run Ruff Check
@@ -285,6 +267,35 @@ ruff check src/ tests/
 # Auto fix issues
 ruff check src/ --fix
 ```
+## Testing Conventions
+
+### Error Message Assertions
+- Use precise text matching for user facing messages that must be exact
+- Use flexible pattern matching (e.g. "ERROR" in c.upper()) for internal error messages
+- Avoid asserting diag() message text in tests
+- Avoid asserting logging.debug() message text in tests
+
+### General Principles
+- Test behavior not implementation
+- Test what the user or caller experiences
+- Avoid brittle dependencies on internal message wording
+
+## Test Data
+## Test Data Structure
+Use CMD>tree to generate markdown graphic
+
+### Same Data
+### Folder Structure
+### Expected Summary Report
+
+### Different Data
+### Folder Structure
+### Expected Summary Report
+
+### No files in targer
+### Folder Structure
+### Expected Summary Report
+
 
 ---
 

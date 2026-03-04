@@ -104,11 +104,11 @@ def launch_gui(root, info):
 
     compare_mode_var = tk.StringVar(value="timestamp")
 
-    find_all_var = tk.BooleanVar()
-    dryrun_var = tk.BooleanVar(value=True)
+    find_all_var = tk.BooleanVar(value=True)  # default
+    dryrun_var = tk.BooleanVar(value=True)    # default
     deletematches_var = tk.BooleanVar()
     deletecandidates_var = tk.BooleanVar()
-    quarantine_var = tk.BooleanVar(value=True)
+    quarantine_var = tk.BooleanVar(value=True) # default
     diagnostics_var = tk.BooleanVar(value=False) # Diagnostics
 
     # -----------------------------

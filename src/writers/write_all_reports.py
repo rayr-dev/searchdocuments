@@ -11,8 +11,14 @@ from writers.text_writer import write_text_output
 from writers.summary_writer import build_summary
 from utilities.logging_setup import diag
 
-def write_all_reports(output_dir, matches, mismatched, missing,
-                      status_callback=None, progress_callback=None):
+def write_all_reports(output_dir,
+                      matches,
+                      mismatched,
+                      missing,
+                      source_count=0,
+                      target_count=0,
+                      status_callback=None, progress_callback=None
+                      ):
     """
     Unified wrapper that writes Excel, CSV, and Text reports.
     Ensures each writer is isolated so one failure does not break the others.
@@ -62,7 +68,7 @@ def write_all_reports(output_dir, matches, mismatched, missing,
         )
         diag("CSV writer completed")
     except Exception as error:
-        diag("ERROR writing CSV report: {error}")
+        diag(f"ERROR writing CSV report: {error}")
         logging.error(f"ERROR writing CSV report: {error}")
         if status_callback:
             status_callback(f"ERROR writing CSV report: {error}")
@@ -88,9 +94,22 @@ def write_all_reports(output_dir, matches, mismatched, missing,
 
 
     # Write summary.txt
-    build_summary(output_dir, matches, mismatched, missing,
-                     progress_callback, status_callback)
-
+    try:
+        build_summary(
+            output_dir,
+            matches,
+            mismatched,
+            missing,
+            source_count=source_count,
+            target_count=target_count,
+            progress_callback=progress_callback,
+            status_callback=status_callback
+        )
+    except Exception as error:
+        logging.error(f"ERROR writing Summary report: {error}")
+        diag(f"ERROR writing Summary report: {error}")
+        if status_callback:
+            status_callback(f"Error writing Summary report: {error}")
     # Final status
     if status_callback:
         status_callback(f"Reports written to: {output_dir}")
