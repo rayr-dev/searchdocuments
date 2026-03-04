@@ -352,6 +352,8 @@ git commit -m "Brief description of changes"
 
 # Push to remote (once GitHub configured)
 git push
+
+
 ```
 
 ### Useful Git Commands
@@ -372,6 +374,21 @@ git log --oneline -5
 
 # Check current branch
 git branch
+# Confirm reports excluded
+git check-ignore -v testdata/reports/
+# Expected: .gitignore:49:testdata/reports/   testdata/reports/  ✅
+
+# Confirm scenario folders NOT excluded
+git check-ignore -v testdata/scenario1_same/
+# Expected: no output  ✅
+
+# Confirm test files NOT excluded
+git check-ignore -v testdata/scenario1_same/source/
+# Expected: no output  ✅
+
+# Confirm debug excluded
+git check-ignore -v testdata/debug/
+# Expected: .gitignore:xx:testdata/debug/   testdata/debug/  ✅
 ```
 
 ### Git Ignore Key Rules
@@ -381,6 +398,75 @@ git branch
 - `__pycache__/` — never commit compiled Python
 - `dist/, build/` — never commit build artifacts
 - `test_debug/` — never commit debug output
+- `test_debug/` — never commit debug output
+- '# Python
+  - '' __pycache__/
+  - '*.pyc
+  - '*.pyo
+  - '*.pyd
+  - '*.egg-info/
+
+- '#Virtual environments
+  - 'venv/
+  - '.env/
+  - '.venv/
+  - 'env/
+
+- '# PyInstaller build artifacts
+  - 'build/
+  - 'dist/
+  - '*.spec
+
+- '# Logs
+    - '*.log
+    - '*.tmp
+- '*.bak
+- '*.swp
+- '~*.*
+- '*~
+
+- '# Quarantine folder
+  - 'Quarantine/
+
+- '# IDE files
+  - '.vscode/
+  - '.idea/
+
+- '# do not checkin these files
+  - '*.tmp
+  - '*.bak
+  - '*.swp
+  - '~*.*
+  - '*~
+
+- '# Generated reports
+- '# Test output
+  - 'testdata/reports/
+  - 'testdata/debug/
+
+
+- '# JSON exception for app version
+  - '*.json
+  - '!src/app_version.json
+
+-# Executables and installers
+  - '*.exe
+  - '*.msi
+  - '*.dll
+  - '*.manifest
+
+-#ignore OS  Editor Junk
+-# macOS
+    - '.DS_Store
+
+'# Windows
+    - 'Thumbs.db
+    - 'desktop.ini
+
+-#Python specific
+    - 'venv/
+  - '__pycache__/
+  - '.pytest_cache/dir
 
 ---
 
