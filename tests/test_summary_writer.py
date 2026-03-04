@@ -21,13 +21,14 @@ def test_print_summary_returns_string():
 
 def test_print_summary_contains_headers():
     result = print_summary([], [], [])
-    assert "SUMMARY REPORT" in result
+    assert "RECONCILIATION REPORT" in result
 
 def test_print_summary_shows_zero_counts():
     result = print_summary([], [], [])
-    assert "Total Exact Matches:     0" in result
-    assert "Total Mismatches:        0" in result
-    assert "Total Missing Files:     0" in result
+    assert "   Total Exact Matches:     0" in result
+    assert "   Total Mismatches:        0" in result
+    assert "   Total Missing Files:     0" in result
+    #      "   Total Files in Source:   {source_count}" <--Used to confirm property aligned w/summary
 
 def test_print_summary_counts_matches():
     matches = [
@@ -93,7 +94,7 @@ def test_build_summary_creates_file(tmp_path):
 def test_build_summary_file_contains_headers(tmp_path):
     build_summary(str(tmp_path), [], [], [])
     content = read_txt(str(tmp_path / "summary.txt"))
-    assert "SUMMARY REPORT" in content
+    assert "RECONCILIATION REPORT" in content
 
 def test_build_summary_shows_correct_counts(tmp_path):
     matches   = [("file1.txt", "pathA", "pathB")]
@@ -101,9 +102,10 @@ def test_build_summary_shows_correct_counts(tmp_path):
     missing   = [("file3.txt", "pathA"), ("file4.txt", "pathA")]
     build_summary(str(tmp_path), matches, mismatched, missing)
     content = read_txt(str(tmp_path / "summary.txt"))
-    assert "Total Exact Matches:     1" in content
-    assert "Total Mismatches:        1" in content
-    assert "Total Missing Files:     2" in content
+    assert "   Total Exact Matches:     1" in content
+    assert "   Total Mismatches:        1" in content
+    assert "   Total Missing Files:     2" in content
+#          "   Total Files in Source:   {source_count}"  <--Used to confirm property aligned <--Used to confirm property aligned
 
 def test_build_summary_status_callback_called(tmp_path):
     status_mock = MagicMock()

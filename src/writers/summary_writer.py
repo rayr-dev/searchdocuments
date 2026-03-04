@@ -52,21 +52,21 @@ def print_summary(matches, mismatched, missing, source_count=0, target_count=0,s
     mixed_cases = sum(1 for name in mismatch_names if name in multi_match_counts)
 
     summary = [
-        "=============== SUMMARY REPORT ===============",
+        "=============== RECONCILIATION REPORT ===============",
         "",
         "Source Statistics:",
-        f"   Total Files in Source: {source_count}",
-        f"   Total Files in Target: {target_count}",
+        f"   Total Files in Source:   {source_count}",
+        f"   Total Files in Target:   {target_count}",
         "",
         "Reconciliation Results:",
-        f"Total Exact Matches:     {total_matches}",
-        f"Total Mismatches:        {total_mismatches}",
-        f"Total Missing Files:     {total_missing}",
+        f"   Total Exact Matches:     {total_matches}",
+        f"   Total Mismatches:        {total_mismatches}",
+        f"   Total Missing Files:     {total_missing}",
         "",
-        f"Multi-Match Cases:       {multi_match_cases}",
-        f"Mixed Match/Mismatch:    {mixed_cases}",
+        f"   Multi-Match Cases:       {multi_match_cases}",
+        f"   Mixed Match/Mismatch:    {mixed_cases}",
         ""
-        "=============================================="
+        "====================================================="
     ]
 
     summary_text = "\n".join(summary)
