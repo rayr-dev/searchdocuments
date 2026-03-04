@@ -12,10 +12,13 @@ from openpyxl.styles import PatternFill
 # Local
 from utilities.logging_setup import diag
 
-def write_excel_output(output_dir, matches, mismatched, missing,
-                       progress_callback=None, status_callback=None):
-
-
+def write_excel_output(output_dir,
+                       matches,
+                       mismatched,
+                       missing,
+                       progress_callback=None,
+                       status_callback=None
+                       ):
 
     diag("EXCEL_WRITER/write_excel_output Starting")
     excel_path = os.path.join(output_dir, "comparison.xlsx")

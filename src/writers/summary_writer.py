@@ -8,8 +8,15 @@ import logging
 from utilities.logging_setup import diag
 
 
-def build_summary(output_dir, matches, mismatched, missing,
-                  source_count=0, target_count=0,progress_callback=None, status_callback=None):
+def build_summary(output_dir,
+                  matches,
+                  mismatched,
+                  missing,
+                  source_count=0,
+                  target_count=0,
+                  progress_callback=None,
+                  status_callback=None
+                  ):
     diag("SUMMARY_WRITER/build_summary Starting")
     summary_path = os.path.join(output_dir, "summary.txt")
 
@@ -36,7 +43,12 @@ def build_summary(output_dir, matches, mismatched, missing,
     return summary_text
 
 
-def print_summary(matches, mismatched, missing, source_count=0, target_count=0,status_callback=None):
+def print_summary(matches,
+                  mismatched,
+                  missing,
+                  source_count=0,
+                  target_count=0,
+                  status_callback=None):
     total_matches = len(matches)
     total_mismatches = len(mismatched)
     total_missing = len(missing)

@@ -10,8 +10,13 @@ from datetime import datetime
 # Local
 from utilities.logging_setup import diag
 
-def write_csv_output(output_dir, matches, mismatched, missing,
-                       progress_callback=None, status_callback=None):
+def write_csv_output(output_dir,
+                     matches,
+                     mismatched,
+                     missing,
+                     progress_callback=None,
+                     status_callback=None
+                     ):
 
     diag("CSV_WRITER/write_csv_output")
     csv_path = os.path.join(output_dir, "comparison.csv")

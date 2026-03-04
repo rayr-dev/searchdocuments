@@ -7,8 +7,12 @@ from datetime import datetime
 # Local
 from utilities.logging_setup import diag
 
-def write_text_output(output_dir, matches, mismatched, missing,
-                       progress_callback=None, status_callback=None):
+def write_text_output(output_dir,
+                      matches,
+                      mismatched,
+                      missing,
+                      progress_callback=None,
+                      status_callback=None):
     diag("TEXT_WRITER/write_text_output Starting")
     txt_path = os.path.join(output_dir, "comparison.txt")
     diag(f"Writing comparison report: {txt_path}")

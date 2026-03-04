@@ -8,7 +8,12 @@ import logging
 from engine.compare_engine import compare_folders_recursive
 from utilities.logging_setup import diag
 
-def run_reconciliation(folderA, folderB, output_dir, progress_callback=None, status_callback=None):
+def run_reconciliation(folderA,
+                       folderB,
+                       output_dir,
+                       progress_callback=None,
+                       status_callback=None
+                       ):
     # All config flags should already be set by CLI or GUI
 
 
