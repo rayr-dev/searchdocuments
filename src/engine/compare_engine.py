@@ -83,11 +83,11 @@ def compare_folders_recursive(folderA,
         mismatch_list = []
 
         for pathB, sizeB, mtimeB in candidatesB:
-            diag(f"COMPARE: {rel}")
+            diag(f"COMPARE LOOP: {rel}")
 
             # TIMESTAMP + SIZE MATCH
             if sizeA == sizeB and abs(mtimeA - mtimeB) <= 1.0:
-                diag(f"MATCH: {rel} (timestamp+size)")
+                diag(f"MATCH ON TIMESTAMP: {rel} (timestamp+size)")
 
                 matches.append((rel, pathA, pathB))
                 found_match = True
@@ -96,41 +96,46 @@ def compare_folders_recursive(folderA,
 
             # ACCURATE MODE (hash confirm)
             if sizeA == sizeB:
-                diag(f"MATCH: {rel} (hash)")
+                diag(f"MATCH ON HASH: {rel} (hash)")
 
                 hashA = file_hash(pathA)
                 hashB = file_hash(pathB)
                 if hashA == hashB:
+                    diag(f"HASHES MATCH: {rel}")
                     matches.append((rel, pathA, pathB))
                     found_match = True
                     continue
 
             # HASH-ONLY MODE
             if config.HASH_ONLY_MODE:
+                diag(f"INSIDE HASH_ONLY_MODE: {rel}")  # ← accurate
                 hashA = file_hash(pathA) # pragma: no cover# pragma: no cover
                 hashB = file_hash(pathB) # pragma: no cover# pragma: no cover
                 if hashA == hashB: # pragma: no cover# pragma: no cover
+                    diag(f"HASH ONLY MODE Hashes match : {rel}")  #
                     matches.append((rel, pathA, pathB))
                     found_match = True
                     continue
 
             # Otherwise mismatch
-            diag(f"MISMATCH: {rel} vs {pathB}")
+            diag(f"OTHER MISMATCH: {rel} vs {pathB}")
             mismatch_list.append((pathB, sizeB, mtimeB))
 
         # FINAL DECISION
         if found_match:
+            diag("FOUND MATCH IF Processing")
             # We DO NOT suppress mismatches anymore.
             # Mixed cases should show both matches and mismatches.
             if mismatch_list:
+                diag(f"FOUND MISMATCH: {rel}")
                 mismatched.append((rel, pathA, mismatch_list))
         else:
             # No matches at all
-            diag(f"MISSING: {rel}")
-
             if mismatch_list:
+                diag(f"NO MATCH FOUND - MISMATCHED: {rel}")
                 mismatched.append((rel, pathA, mismatch_list))
             else:
+                diag(f"NO MATCH and NO MISMATCH: {rel}")  # ← accurate
                 missing.append((rel, pathA)) # pragma: no cover# pragma: no cover
 
     if progress_callback:
@@ -161,8 +166,10 @@ def compare_folders_recursive(folderA,
         matches,
         mismatched,
         missing,
-        source_count=len(filesA),
-        target_count=len(filesB),
+        source_count=source_count,
+        target_count=target_count,
+        source_unique=len(filesA),
+        target_unique=len(filesB),
         status_callback=status_callback,
         progress_callback=progress_callback
     )
@@ -175,8 +182,8 @@ def compare_folders_recursive(folderA,
         "matches": matches,
         "mismatched": mismatched,
         "missing": missing,
-        "source_count" : len(filesA),
-        "target_count" : len(filesB),
+        "source_count" : source_count,
+        "target_count" : target_count,
         "source_unique" : len(filesA),
         "target_unique" : len(filesB)
     }
@@ -186,8 +193,10 @@ def compare_folders_recursive(folderA,
         matches,
         mismatched,
         missing,
-        source_count=len(filesA),
-        target_count=len(filesB),
+        source_count=source_count,
+        target_count=target_count,
+        source_unique=len(filesA),
+        target_unique=len(filesB),
         status_callback=status_callback
     )
     return results, summary_text
