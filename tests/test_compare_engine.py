@@ -107,10 +107,10 @@ def test_empty_folders_return_empty_results(folders):
 def test_timestamp_match_detected(folders, monkeypatch):
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engin
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # Create matching files in both folders
     fileA = (folderA + "/file.txt")
@@ -135,10 +135,10 @@ def test_timestamp_match_detected(folders, monkeypatch):
 def test_missing_file_detected(folders, monkeypatch):
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engin
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # Only create file in A, not in B
     open(folderA + "/missing.txt", "w").write("only in A")
@@ -155,10 +155,10 @@ def test_missing_file_detected(folders, monkeypatch):
 def test_mismatch_detected(folders, monkeypatch):
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # Same filename, different content and mtime
     open(folderA + "/file.txt", "w").write("version A")
@@ -179,10 +179,10 @@ def test_mismatch_detected(folders, monkeypatch):
 def test_hash_only_mode_match(folders, monkeypatch):
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", True)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", True)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # Same content, different mtime — should still match via hash
     open(folderA + "/file.txt", "w").write("identical content")
@@ -206,10 +206,10 @@ def test_hash_only_mode_match(folders, monkeypatch):
 def test_status_callback_called(folders, monkeypatch):
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     status_mock = MagicMock()
 
@@ -225,10 +225,10 @@ def test_status_callback_called(folders, monkeypatch):
 def test_progress_callback_called(folders, monkeypatch):
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     progress_mock = MagicMock()
 
@@ -248,10 +248,11 @@ def test_accurate_mode_hash_match(folders, monkeypatch):
     """Same size, same content — should match via hash confirm."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", True)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
 
     # Same content = same size + same hash, but different mtime
     open(folderA + "/file.txt", "w").write("identical content")
@@ -274,10 +275,10 @@ def test_accurate_mode_hash_mismatch(folders, monkeypatch):
     """Same size, different content — hash should not match, goes to mismatch."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", True)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # Same size but different content
     open(folderA + "/file.txt", "w").write("aaaaaaaaa")
@@ -296,6 +297,84 @@ def test_accurate_mode_hash_mismatch(folders, monkeypatch):
 
     assert len(results["mismatched"]) == 1
 
+def test_accurate_mode_same_size_diff_timestamp_hash_match(folders, monkeypatch):
+    """Same size, different timestamp, same content — should match via hash."""
+    folderA, folderB, output = folders
+
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    import os
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", True)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
+
+    open(folderA + "/file.txt", "w").write("identical content")
+    open(folderB + "/file.txt", "w").write("identical content")
+
+    # Force different mtime AND different size check won't apply
+    # but same size — hits lines 133-140
+    mtime_a = os.path.getmtime(folderA + "/file.txt")
+    os.utime(folderB + "/file.txt", (mtime_a + 100, mtime_a + 100))
+
+    with patch(PATCH_WRITE, return_value=None), \
+         patch(PATCH_SUMMARY, return_value=""), \
+         patch(PATCH_DUMP, return_value=None), \
+         patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    assert len(results["matches"]) == 1
+
+def test_accurate_mode_same_size_diff_timestamp_hash_mismatch(folders, monkeypatch):
+    """Same size, different timestamp, different content — should mismatch."""
+    folderA, folderB, output = folders
+
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    import os
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", True)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
+
+    # Same size different content
+    open(folderA + "/file.txt", "w").write("aaaaaaaaa")
+    open(folderB + "/file.txt", "w").write("bbbbbbbbb")
+
+    mtime_a = os.path.getmtime(folderA + "/file.txt")
+    os.utime(folderB + "/file.txt", (mtime_a + 100, mtime_a + 100))
+
+    with patch(PATCH_WRITE, return_value=None), \
+            patch(PATCH_SUMMARY, return_value=""), \
+            patch(PATCH_DUMP, return_value=None), \
+            patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    assert len(results["mismatched"]) == 1
+
+def test_accurate_mode_timestamp_match_rejected_by_hash(folders, monkeypatch):
+    """Same size and timestamp but different content — hash rejects the match."""
+    folderA, folderB, output = folders
+
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    import os
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", True)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
+
+    # Same size same timestamp but different content
+    open(folderA + "/file.txt", "w").write("aaaaaaaaa")
+    open(folderB + "/file.txt", "w").write("bbbbbbbbb")
+
+    # Force same mtime — timestamp check passes but hash should reject
+    mtime_a = os.path.getmtime(folderA + "/file.txt")
+    os.utime(folderB + "/file.txt", (mtime_a, mtime_a))
+
+    with patch(PATCH_WRITE, return_value=None), \
+            patch(PATCH_SUMMARY, return_value=""), \
+            patch(PATCH_DUMP, return_value=None), \
+            patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    assert len(results["mismatched"]) == 1
 # -----------------------------
 # Mixed match + mismatch tests
 # Lines 84-89, 100
@@ -304,10 +383,10 @@ def test_mixed_match_and_mismatch(folders, monkeypatch):
     """File matches one copy in B but mismatches another — should appear in both."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     import os
 
@@ -348,16 +427,16 @@ def test_no_match_goes_to_missing(folders, monkeypatch):
     """File in A has a candidate in B but nothing matches — goes to missing."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config,
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config,
                         "HASH_ONLY_MODE",
                         False
                         )
-    monkeypatch.setattr(config,
+    monkeypatch.setattr(engine_module.config,
                         "HASH_COMPARE_MODE",
                         False
                         )
-    monkeypatch.setattr(config,
+    monkeypatch.setattr(engine_module.config,
                         "TIMESTAMPED_OUTPUT",
                         False
                         )
@@ -386,10 +465,10 @@ def test_truly_missing_file_no_candidates(folders, monkeypatch):
     """File in A has NO matching filename in B at all — pure missing."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # File in A only — nothing in B with this name
     open(folderA + "/uniquefile.txt", "w").write("only exists in A")
@@ -409,11 +488,11 @@ def test_found_match_with_mismatch_sibling(folders, monkeypatch):
     """One copy in B matches, another copy in B mismatches — both recorded."""
     folderA, folderB, output = folders
 
-    import src.config as config
+    import src.engine.compare_engine as engine_module  # ← patch via engine
     import os
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # File in A
     open(folderA + "/report.txt", "w").write("report data")
@@ -447,16 +526,16 @@ def test_hash_only_mode_different_sizes_same_hash(folders, monkeypatch):
     """HASH-ONLY: force different sizes via scan results so accurate mode skipped."""
     folderA, folderB, output = folders
 
-    import src.config as config
+    import src.engine.compare_engine as engine_module  # ← patch via engine
     import os
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", True)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", True)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     real_pathA = folderA + "/file.txt"
     real_pathB = folderB + "/file.txt"
     open(real_pathA, "w").write("identical content")
-    open(real_pathB, "w").write("identical content")
+    open(real_pathB, "w").write("different content here")
 
     real_size  = os.path.getsize(real_pathA)
     real_mtime = os.path.getmtime(real_pathA)
@@ -478,11 +557,11 @@ def test_file_with_no_candidates_goes_to_missing(folders, monkeypatch):
     """File in A has zero candidates in B — hits line 111 missing.append."""
     folderA, folderB, output = folders
 
-    import src.config as config
+    import src.engine.compare_engine as engine_module  # ← patch via engine
     import os
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     real_pathA = folderA + "/ghost.txt"
     open(real_pathA, "w").write("only in A")
@@ -507,8 +586,8 @@ def test_returns_source_and_target_counts(folders, monkeypatch):
     """Results dict should contain source and target file counts."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     # Create 2 files in source, 3 in target
     open(folderA + "/file1.txt", "w").write("content")
@@ -536,9 +615,8 @@ def test_compare_folders_handles_walk_error(folders, monkeypatch):
     """Should handle os.walk failure gracefully and default counts to 0."""
     folderA, folderB, output = folders
 
-    import src.config as config
-    import src.engine.compare_engine as engine_module
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    import src.engine.compare_engine as engine_module  # ← patch via engine
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
 
     original_walk = os.walk
     call_count = 0

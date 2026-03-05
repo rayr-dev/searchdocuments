@@ -85,36 +85,59 @@ def compare_folders_recursive(folderA,
         for pathB, sizeB, mtimeB in candidatesB:
             diag(f"COMPARE LOOP: {rel}")
 
-            # TIMESTAMP + SIZE MATCH
+            # HASH ONLY MODE - ignore timestamp completely
+            if config.HASH_ONLY_MODE:  # pragma: no cover
+                diag(f"INSIDE HASH_ONLY_MODE: {rel}")
+                hashA = file_hash(pathA)  # pragma: no cover
+                hashB = file_hash(pathB)  # pragma: no cover
+                if hashA == hashB:  # pragma: no cover
+                    diag(f"HASH ONLY MODE - Hashes match: {rel}")
+                    matches.append((rel, pathA, pathB))
+                    found_match = True
+                    continue  # pragma: no cover
+                # If hash doesn't match fall through to mismatch
+                diag(f"HASH ONLY MODE - Hashes differ: {rel}")  # pragma: no cover
+                mismatch_list.append((pathB, sizeB, mtimeB))  # pragma: no cover
+                continue  # pragma: no cover
+
+            # TIMESTAMP + SIZE MATCH - always first step for non hash-only modes
             if sizeA == sizeB and abs(mtimeA - mtimeB) <= 1.0:
                 diag(f"MATCH ON TIMESTAMP: {rel} (timestamp+size)")
 
-                matches.append((rel, pathA, pathB))
-                found_match = True
-                # DO NOT break — allow multi-match
-                continue
-
-            # ACCURATE MODE (hash confirm)
-            if sizeA == sizeB:
-                diag(f"MATCH ON HASH: {rel} (hash)")
-
-                hashA = file_hash(pathA)
-                hashB = file_hash(pathB)
-                if hashA == hashB:
-                    diag(f"HASHES MATCH: {rel}")
+                if config.HASH_COMPARE_MODE:
+                    # ACCURATE MODE - confirm timestamp match with hash
+                    diag(f"HASH_COMPARE_MODE - confirming with hash: {rel}")
+                    hashA = file_hash(pathA)
+                    hashB = file_hash(pathB)
+                    if hashA == hashB:
+                        diag(f"HASH CONFIRMED MATCH: {rel}")
+                        matches.append((rel, pathA, pathB))
+                        found_match = True
+                        continue
+                    else:
+                        diag(f"HASH REJECTED TIMESTAMP MATCH: {rel}")
+                        mismatch_list.append((pathB, sizeB, mtimeB))
+                        continue
+                else:
+                    # FAST MODE - timestamp+size match is sufficient
+                    diag(f"FAST MODE MATCH: {rel}")
                     matches.append((rel, pathA, pathB))
                     found_match = True
                     continue
 
-            # HASH-ONLY MODE
-            if config.HASH_ONLY_MODE:
-                diag(f"INSIDE HASH_ONLY_MODE: {rel}")  # ← accurate
-                hashA = file_hash(pathA) # pragma: no cover# pragma: no cover
-                hashB = file_hash(pathB) # pragma: no cover# pragma: no cover
-                if hashA == hashB: # pragma: no cover# pragma: no cover
-                    diag(f"HASH ONLY MODE Hashes match : {rel}")  #
+            # SAME SIZE but timestamp differs - try hash if accurate mode
+            if sizeA == sizeB and config.HASH_COMPARE_MODE:
+                diag(f"SAME SIZE DIFF TIMESTAMP - trying hash: {rel}")
+                hashA = file_hash(pathA)
+                hashB = file_hash(pathB)
+                if hashA == hashB:
+                    diag(f"HASH MATCH ON SAME SIZE: {rel}")
                     matches.append((rel, pathA, pathB))
                     found_match = True
+                    continue
+                else:
+                    diag(f"HASH MISMATCH ON SAME SIZE: {rel}")
+                    mismatch_list.append((pathB, sizeB, mtimeB))
                     continue
 
             # Otherwise mismatch
