@@ -289,3 +289,10 @@ def test_run_cli_prints_summary(tmp_path, monkeypatch, capsys):
         run_cli()
     captured = capsys.readouterr()
     assert "Summary output here" in captured.out
+
+def test_cli_main_entry_point():
+    """Test that __main__ entry point calls run_cli."""
+    with patch("src.cli.cli_main.run_cli") as mock_run:
+        import runpy
+        runpy.run_path("src/cli/cli_main.py", run_name="__main__")
+        mock_run.assert_called_once()
