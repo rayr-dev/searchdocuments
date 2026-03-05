@@ -105,6 +105,8 @@ def write_all_reports(output_dir,
             missing,
             source_count=source_count,
             target_count=target_count,
+            source_unique=source_unique,
+            target_unique=target_unique,
             progress_callback=progress_callback,
             status_callback=status_callback
         )

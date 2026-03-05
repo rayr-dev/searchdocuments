@@ -18,7 +18,7 @@ REM Step 1: Code Quality Check
 REM ------------------------------------------------
 echo [1/5] Running Ruff code quality check...
 call venv\Scripts\activate
-ruff check src/
+ruff check src/ tests/
 if %ERRORLEVEL% NEQ 0 (
     echo.
     echo FAILED: Ruff check failed.
