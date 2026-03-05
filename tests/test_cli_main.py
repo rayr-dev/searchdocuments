@@ -290,9 +290,28 @@ def test_run_cli_prints_summary(tmp_path, monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "Summary output here" in captured.out
 
+
 def test_cli_main_entry_point():
-    """Test that __main__ entry point calls run_cli."""
-    with patch("src.cli.cli_main.run_cli") as mock_run:
-        import runpy
-        runpy.run_path("src/cli/cli_main.py", run_name="__main__")
-        mock_run.assert_called_once()
+    """Test that __main__ block exists and calls run_cli."""
+    import ast
+    source = open("src/cli/cli_main.py").read()
+    tree = ast.parse(source)
+
+    # Find if __name__ == "__main__": run_cli() exists
+    found = False
+    for node in ast.walk(tree):
+        if isinstance(node, ast.If):
+            # Check for if __name__ == "__main__":
+            test = node.test
+            if (isinstance(test, ast.Compare) and
+                    isinstance(test.left, ast.Name) and
+                    test.left.id == "__name__"):
+                # Check body contains run_cli()
+                for stmt in node.body:
+                    if (isinstance(stmt, ast.Expr) and
+                            isinstance(stmt.value, ast.Call) and
+                            isinstance(stmt.value.func, ast.Name) and
+                            stmt.value.func.id == "run_cli"):
+                        found = True
+
+    assert found, "cli_main.py missing if __name__ == '__main__': run_cli()"

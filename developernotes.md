@@ -18,13 +18,13 @@ identify and resolve file organization gaps.
 
 ### Result Actions
 
-| Result | Meaning                                    | Immediate Action | Follow-up Action                           |
-|--------|--------------------------------------------| ---------------- |--------------------------------------------|   
-| Exact Match | SOURCE file confirmed in TARGET | Delete SOURCE or move to Quarantine | Run tool again to verify                   |
-| Missing | SOURCE file not in TARGET |Manual copy to correct TARGET location" | Run tool again — should become Exact Match |
-| Mismatch | Same filename different content | Determine gold standard | Update SOURCE or TARGET accordingly        |
-| Multi-Match | SOURCE file in multiple TARGET locations |Keep correct location, clean up duplicates| Run tool again to verify                   |
-| Mixed | Some TARGET copies match some don't |Keep matches, review mismatches| Resolve mismatches then run again |
+| Result      | Meaning                                  | Immediate Action                           | Follow-up Action                           |
+|-------------|------------------------------------------|--------------------------------------------|--------------------------------------------|   
+| Exact Match | SOURCE file confirmed in TARGET          | Delete SOURCE or move to Quarantine        | Run tool again to verify                   |
+| Missing     | SOURCE file not in TARGET                | Manual copy to correct TARGET location"    | Run tool again — should become Exact Match |
+| Mismatch    | Same filename different content          | Determine gold standard                    | Update SOURCE or TARGET accordingly        |
+| Multi-Match | SOURCE file in multiple TARGET locations | Keep correct location, clean up duplicates | Run tool again to verify                   |
+| Mixed       | Some TARGET copies match some don't      | Keep matches, review mismatches            | Resolve mismatches then run again          |
 
 ### Recommended Workflow
 
@@ -136,14 +136,14 @@ searchdocuments/
 └── README.md                    # User documentation
 ```
 ## Smoke Test Data Expected Results
-| Scenario | Src Files | Tgt Files | Matches | Mismatches | Missing | Multi | Mixed |
-|--------- | --------- | --------- | ------- | ---------- |---------| ----- | ----- |
-| 1-Identical | 4 | 4 | 4 | 0 | 0 | 1 | 0 |
-| 2-Mixed | 13 | 12 | 7 | 2 | 1 | 2 | 1 |
-| 3-Empty Source | 0 | 4 | 0 | 0 | 0 | 0 | 0 |
-| 4-Empty Target | 4 | 0| 0 | 0 | 2 | 0 | 0 |
-| 5-Deep Nested | 2 | 2 | 2 | 0 | 0 | 0 | 0 |
-| 6=Special Chars | 7 | 7 | 7 | 0 | 0 | 0 | 0 |
+| Scenario        | Src Files | Tgt Files | Matches | Mismatches | Missing | Multi | Mixed |
+|-----------------|-----------|-----------|---------|------------|---------|-------|-------|
+| 1-Identical     | 4         | 4         | 4       | 0          | 0       | 1     | 0     |
+| 2-Mixed         | 13        | 12        | 7       | 2          | 1       | 2     | 1     |
+| 3-Empty Source  | 0         | 4         | 0       | 0          | 0       | 0     | 0     |
+| 4-Empty Target  | 4         | 0         | 0       | 0          | 2       | 0     | 0     |
+| 5-Deep Nested   | 2         | 2         | 2       | 0          | 0       | 0     | 0     |
+| 6=Special Chars | 7         | 7         | 7       | 0          | 0       | 0     | 0     |
 ---
 
 ## Development Environment Setup
@@ -191,18 +191,18 @@ You will know venv is active when you see `(venv)` in your prompt:
 ## Dependencies
 
 ### Runtime Dependencies
-| Package | Version | Purpose |
-|---------|---------|---------|
-| openpyxl | latest | Excel report generation |
-| tkinter | built-in | GUI framework |
+| Package  | Version  | Purpose                 |
+|----------|----------|-------------------------|
+| openpyxl | latest   | Excel report generation |
+| tkinter  | built-in | GUI framework           |
 
 ### Development Dependencies
-| Package | Version | Purpose |
-|---------|---------|---------|
-| pytest | latest | Test runner |
-| pytest-cov | latest | Code coverage reporting |
-| pytest-ruff | latest | Ruff integration with pytest |
-| ruff | latest | Code quality and linting |
+| Package     | Version | Purpose                      |
+|-------------|---------|------------------------------|
+| pytest      | latest  | Test runner                  |
+| pytest-cov  | latest  | Code coverage reporting      |
+| pytest-ruff | latest  | Ruff integration with pytest |
+| ruff        | latest  | Code quality and linting     |
 
 ### Installing All Dependencies
 ```bash
@@ -240,40 +240,40 @@ dist\Search-documents_CLI.exe folderA folderB -o output_dir
 ```
 
 ### CLI Arguments
-| Argument | Type | Description |
-|----------|------|-------------|
-| `folderA` | required | Source folder path |
-| `folderB` | required | Target folder path |
-| `-o, --output` | required | Output directory for reports |
-| `--hash` | flag | Enable hash comparison mode |
-| `--hashonly` | flag | Enable hash-only mode |
-| `--findall` | flag | Find all locations in Folder B |
-| `--dryrun` | flag | Dry run, no changes made |
-| `--deletematches` | flag | Delete exact matches |
-| `--deletecandidates` | flag | Delete mismatch candidates |
-| `--quarantine` | flag | Use quarantine folder |
-| `--diag` | flag | Enable diagnostic output |
-| `--version` | flag | Show version number |
+| Argument             | Type     | Description                    |
+|----------------------|----------|--------------------------------|
+| `folderA`            | required | Source folder path             |
+| `folderB`            | required | Target folder path             |
+| `-o, --output`       | required | Output directory for reports   |
+| `--hash`             | flag     | Enable hash comparison mode    |
+| `--hashonly`         | flag     | Enable hash-only mode          |
+| `--findall`          | flag     | Find all locations in Folder B |
+| `--dryrun`           | flag     | Dry run, no changes made       |
+| `--deletematches`    | flag     | Delete exact matches           |
+| `--deletecandidates` | flag     | Delete mismatch candidates     |
+| `--quarantine`       | flag     | Use quarantine folder          |
+| `--diag`             | flag     | Enable diagnostic output       |
+| `--version`          | flag     | Show version number            |
 
 ---
 
 ## Configuration Flags (config.py)
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `DIAGNOSTIC_MODE` | False | Master diagnostic switch |
-| `DIAG_SCAN` | False | Scan diagnostic output |
-| `DIAG_COMPARE` | False | Compare diagnostic output |
-| `DIAG_WRITERS` | False | Writers diagnostic output |
-| `FIND_ALL_LOCATIONS_MODE` | False | Find all file locations |
-| `TIMESTAMPED_OUTPUT` | True | Timestamped output folders |
-| `SILENT_MODE` | False | Suppress console output |
-| `HASH_COMPARE_MODE` | False | Timestamp+size then hash |
-| `HASH_ONLY_MODE` | False | Hash only comparison |
-| `DRY_RUN` | False | No changes made |
-| `USE_QUARANTINE` | False | Quarantine instead of delete |
-| `DELETE_EXACT_MATCHES` | False | Delete exact matches |
-| `DELETE_CANDIDATES` | False | Delete mismatch candidates |
+| Flag                      | Default | Description                  |
+|---------------------------|---------|------------------------------|
+| `DIAGNOSTIC_MODE`         | False   | Master diagnostic switch     |
+| `DIAG_SCAN`               | False   | Scan diagnostic output       |
+| `DIAG_COMPARE`            | False   | Compare diagnostic output    |
+| `DIAG_WRITERS`            | False   | Writers diagnostic output    |
+| `FIND_ALL_LOCATIONS_MODE` | False   | Find all file locations      |
+| `TIMESTAMPED_OUTPUT`      | True    | Timestamped output folders   |
+| `SILENT_MODE`             | False   | Suppress console output      |
+| `HASH_COMPARE_MODE`       | False   | Timestamp+size then hash     |
+| `HASH_ONLY_MODE`          | False   | Hash only comparison         |
+| `DRY_RUN`                 | False   | No changes made              |
+| `USE_QUARANTINE`          | False   | Quarantine instead of delete |
+| `DELETE_EXACT_MATCHES`    | False   | Delete exact matches         |
+| `DELETE_CANDIDATES`       | False   | Delete mismatch candidates   |
 
 ---
 
@@ -306,32 +306,32 @@ pytest -v --cov=src --cov-report=term-missing
 ```
 
 ### Debug Switch Reference
-| Switch | Purpose |
-|--------|---------|
-| `-v` | Verbose — shows each test name |
-| `-s` | Shows print() output in console |
-| `-l` | Shows local variable values on failure |
-| `--basetemp` | Saves temp files to browsable folder |
+| Switch       | Purpose                                |
+|--------------|----------------------------------------|
+| `-v`         | Verbose — shows each test name         |
+| `-s`         | Shows print() output in console        |
+| `-l`         | Shows local variable values on failure |
+| `--basetemp` | Saves temp files to browsable folder   |
 
 ### Current Coverage Status
-| File | Coverage |
-|------|----------|
-| `config.py` | 100% |
-| `compare_engine.py` | 100% |
-| `logging_setup.py` | 100% |
-| `orchestrator.py` | 100% |
-| `output.py` | 100% |
-| `path_utils.py` | 100% |
-| `safe_delete.py` | 100% |
-| `scan_folder.py` | 100% |
-| `csv_writer.py` | 100% |
-| `excel_writer.py` | 100% |
-| `summary_writer.py` | 100% |
-| `text_writer.py` | 100% |
-| `write_all_reports.py` | 100% |
-| `cli_main.py` | 100% |
-| `gui_main.py` | 0% (by design) |
-| **Total** | **77%** |
+| File                   | Coverage       |
+|------------------------|----------------|
+| `config.py`            | 100%           |
+| `compare_engine.py`    | 100%           |
+| `logging_setup.py`     | 100%           |
+| `orchestrator.py`      | 100%           |
+| `output.py`            | 100%           |
+| `path_utils.py`        | 100%           |
+| `safe_delete.py`       | 100%           |
+| `scan_folder.py`       | 100%           |
+| `csv_writer.py`        | 100%           |
+| `excel_writer.py`      | 100%           |
+| `summary_writer.py`    | 100%           |
+| `text_writer.py`       | 100%           |
+| `write_all_reports.py` | 100%           |
+| `cli_main.py`          | 100%           |
+| `gui_main.py`          | 0% (by design) |
+| **Total**              | **77%**        |
 
 ---
 Current Coverage Status
@@ -351,16 +351,16 @@ ruff check src/ --fix
 ```
 ## Testing Conventions
 ### Specific Topics Relevant to Unit Testing
-|Topic | What Used for | Reference |
-|------|---------------|-----------|
-| MagicMock | Status/progress callbacks | unittest.mock docs |
-| patch |Replacing writers, reconciliation| Real Python mock article|
-| side_effect| Simulating exceptions| unittest.mock docs|
-| return_value | Controlling mock output | unittest.mock docs|
-| monkeypatch | sys.argv, config flags | pytest docs|
-| tmp_path | Temporary file creation | pytest docs|
-| caplog | Log message capture | pytest docs|
- | capsys | stdout/stderr capture | pytest docs|
+| Topic        | What Used for                     | Reference                |
+|--------------|-----------------------------------|--------------------------|
+| MagicMock    | Status/progress callbacks         | unittest.mock docs       |
+| patch        | Replacing writers, reconciliation | Real Python mock article |
+| side_effect  | Simulating exceptions             | unittest.mock docs       |
+| return_value | Controlling mock output           | unittest.mock docs       |
+| monkeypatch  | sys.argv, config flags            | pytest docs              |
+| tmp_path     | Temporary file creation           | pytest docs              |
+| caplog       | Log message capture               | pytest docs              |
+ | capsys       | stdout/stderr capture             | pytest docs              |
 
 ### Key Concepts to Focus On:
 MagicMock vs Mock:
@@ -448,7 +448,7 @@ pytest fixtures docs — deep dive into tmp_path, monkeypatch, caplog
 status_mock = MagicMock()
 write_all_reports(..., status_callback=status_mock)
 assert status_mock.called
-calls = [c[0][0] for c in status_mock.call_args_list]
+calls = "[c[0][0]" for c in status_mock.call_args_list]
 assert any("ERROR" in c.upper() for c in calls)
 
 #### Pattern 2 - Patch writer to isolate test
@@ -501,7 +501,7 @@ in the full suite due to test ordering.
 
 ## Test Data
 ## Test Data Structure
-Use CMD>tree to generate markdown graphic
+Use CMD>tree to generate Markdown graphic
 
 ### Same Data
 ### Folder Structure
@@ -793,25 +793,25 @@ pyinstaller --version
 ## Logging Best Practices
 ---
 ### Logging Conventions
-| Method | When to Use |
-|--------|-------------|
-| `logging.info()` | Normal operational messages |
-| `logging.warning()` | Unexpected but recoverable situations |
-| `logging.error()` | Something failed but app continues |
-| `logging.exception()` | Errors with full stack trace |
-| `diag()` | Detailed debug info when DIAGNOSTIC_MODE=True |
-| `print()` | User facing CLI output only |
+| Method                | When to Use                                   |
+|-----------------------|-----------------------------------------------|
+| `logging.info()`      | Normal operational messages                   |
+| `logging.warning()`   | Unexpected but recoverable situations         |
+| `logging.error()`     | Something failed but app continues            |
+| `logging.exception()` | Errors with full stack trace                  |
+| `diag()`              | Detailed debug info when DIAGNOSTIC_MODE=True |
+| `print()`             | User facing CLI output only                   |
 
 ### Files Audit Logging Summary
-| File        | Logging | diag | print|
-|-------------| ------- | ---- | -----|
-| gui_main.py | init, errors | config state, run details | never |
-| cli_main.py | init, errors | config state, run details | summary only |
-| compare_engine.py | none needed | scan, compare results, match details | never |
-| orchestrator.py | start/end milestones | entry point | never |
-| writers/ | errors only | checkpoints, completion | never |
-| utilities/ | errors only | internal state | never |
-| config.py | none needed | none needed | never|
+| File              | Logging              | diag                                 | print        |
+|-------------------|----------------------|--------------------------------------|--------------|
+| gui_main.py       | init, errors         | config state, run details            | never        |
+| cli_main.py       | init, errors         | config state, run details            | summary only |
+| compare_engine.py | none needed          | scan, compare results, match details | never        |
+| orchestrator.py   | start/end milestones | entry point                          | never        |
+| writers/          | errors only          | checkpoints, completion              | never        |
+| utilities/        | errors only          | internal state                       | never        |
+| config.py         | none needed          | none needed                          | never        |
 
 
 ```bash
