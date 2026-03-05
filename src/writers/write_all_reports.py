@@ -17,7 +17,10 @@ def write_all_reports(output_dir,
                       missing,
                       source_count=0,
                       target_count=0,
-                      status_callback=None, progress_callback=None
+                      source_unique=0,
+                      target_unique=0,
+                      status_callback=None,
+                      progress_callback=None
                       ):
     """
     Unified wrapper that writes Excel, CSV, and Text reports.

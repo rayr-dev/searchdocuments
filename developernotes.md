@@ -5,6 +5,80 @@ Search Documents is a file reconciliation tool that compares a SOURCE folder
 against a TARGET folder to identify exact matches, mismatches, and missing files.
 The tool supports both a GUI interface and a CLI interface.
 
+## Tool Purpose
+
+Search Documents reconciles SOURCE files against TARGET to 
+identify and resolve file organization gaps.
+
+### Definitions
+- SOURCE: Files that should exist in TARGET, may have 
+          different folder structure
+- TARGET: Destination being normalized, gold standard 
+          for folder structure
+
+### Result Actions
+
+| Result | Meaning                                    | Immediate Action | Follow-up Action                           |
+|--------|--------------------------------------------| ---------------- |--------------------------------------------|   
+| Exact Match | SOURCE file confirmed in TARGET | Delete SOURCE or move to Quarantine | Run tool again to verify                   |
+| Missing | SOURCE file not in TARGET |Manual copy to correct TARGET location" | Run tool again — should become Exact Match |
+| Mismatch | Same filename different content | Determine gold standard | Update SOURCE or TARGET accordingly        |
+| Multi-Match | SOURCE file in multiple TARGET locations |Keep correct location, clean up duplicates| Run tool again to verify                   |
+| Mixed | Some TARGET copies match some don't |Keep matches, review mismatches| Resolve mismatches then run again |
+
+### Recommended Workflow
+
+### Reconciliation Loop
+1. Run tool in DRY_RUN mode — review results
+2. Copy Missing files to appropriate TARGET location
+3. Resolve Mismatches — determine gold standard
+4. Run tool with QUARANTINE enabled — move Exact Matches
+5. Verify Quarantine contents
+6. Run tool again — verify clean results
+7. Repeat until SOURCE is empty or all accounted for
+
+### Recommended Workflow
+
+#### Phase 1 - TARGET Cleanup
+Run with TARGET as both FolderA and FolderB:
+- Identify duplicate files in TARGET
+- Resolve same filename different content
+- Expected: Missing = 0 always
+
+#### Phase 2 - SOURCE Reconciliation (Dry Run First)
+Run with SOURCE as FolderA and TARGET as FolderB:
+    --dryrun
+- Review all results before making changes
+- Identify Missing files for manual copying
+- Identify Exact Matches for deletion/quarantine
+
+#### Phase 3 - Execute Reconciliation
+Run again with action flags:
+    --quarantine --deletematches
+- Exact Matches moved to Quarantine
+- Verify Quarantine contents before emptying
+
+#### Phase 4 - Verify Clean
+Run tool again:
+- Missing = 0 ✅
+- Exact Matches = 0 ✅  
+- SOURCE fully reconciled ✅
+
+#### Phase 5 - File Placement (Future)
+AI classification for Missing files:
+- Suggests TARGET location based on content/context
+- Generates action plan for human review
+- Execute approved plan automatically
+
+### Design Principles
+- Filename-only matching allows cross-structure comparison
+- TARGET folder structure is the gold standard
+- SOURCE folder structure is not relevant to matching
+- Find All Files enabled by default
+- DRY_RUN recommended before any destructive operations
+- Quarantine preferred over direct deletion for safety
+- All destructive actions require explicit flag enablement
+- Reconciliation is iterative — run multiple times until clean
 ---
 
 ## Project Structure

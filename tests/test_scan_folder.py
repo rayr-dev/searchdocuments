@@ -1,7 +1,10 @@
 # tests/test_scan_folder.py
-
+# System
 import os
-import pytest
+import logging
+
+# local
+import config
 from src.utilities.scan_folder import scan_folder, dump_scan_results
 
 # -----------------------------
@@ -98,21 +101,28 @@ def test_scan_folder_multi_mode_empty_folder(tmp_path):
 # -----------------------------
 # dump_scan_results tests
 # -----------------------------
-def test_dump_scan_results_runs_without_error(tmp_path, capsys):
+def test_dump_scan_results_runs_without_error(tmp_path, caplog):
+    import config
     # capsys is a pytest built-in that captures print output
-    filesA = {"file1.txt": (str(tmp_path / "file1.txt"), 100, 1234567890.0)}
-    filesB = {"file1.txt": [(str(tmp_path / "file1.txt"), 100, 1234567890.0)]}
-    dump_scan_results(filesA, filesB)
-    captured = capsys.readouterr()
-    assert "FILES A" in captured.out
-    assert "FILES B" in captured.out
+    config.DIAGNOSTIC_MODE = True
+    filesA = {"file1.txt": (str(tmp_path / "file1.txt"), 100, 1000.0)}
+    filesB = {"file1.txt": [(str(tmp_path / "file1.txt"), 100, 1000.0)]}
+    with caplog.at_level(logging.DEBUG):
+        dump_scan_results(filesA, filesB)
+    assert "FILES A" in caplog.text
+    assert "FILES B" in caplog.text
+    config.DIAGNOSTIC_MODE = False
 
-def test_dump_scan_results_shows_keys(tmp_path, capsys):
-    filesA = {"myfile.txt": (str(tmp_path / "myfile.txt"), 50, 1234567890.0)}
+def test_dump_scan_results_shows_keys(tmp_path, caplog):
+    import config
+    config.DIAGNOSTIC_MODE = True
+    filesA = {"myfile.txt": (str(tmp_path / "myfile.txt"), 200, 2000.0)}
     filesB = {}
-    dump_scan_results(filesA, filesB)
-    captured = capsys.readouterr()
-    assert "myfile.txt" in captured.out
+    with caplog.at_level(logging.DEBUG):
+        dump_scan_results(filesA, filesB)
+    assert "myfile.txt" in caplog.text
+    assert "myfile.txt" in caplog.text
+    config.DIAGNOSTIC_MODE = False
 
 def test_scan_folder_skips_unreadable_file(tmp_path, monkeypatch):
     (tmp_path / "locked.txt").write_text("data")

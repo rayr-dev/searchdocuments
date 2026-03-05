@@ -14,6 +14,8 @@ def build_summary(output_dir,
                   missing,
                   source_count=0,
                   target_count=0,
+                  source_unique=0,
+                  target_unique=0,
                   progress_callback=None,
                   status_callback=None
                   ):
@@ -30,6 +32,8 @@ def build_summary(output_dir,
         matches, mismatched, missing,
         source_count=source_count,  # ← pass counts through
         target_count=target_count,
+        source_unique=source_unique,
+        target_unique=target_unique,
         status_callback=status_callback
     )
 
@@ -48,11 +52,15 @@ def print_summary(matches,
                   missing,
                   source_count=0,
                   target_count=0,
+                  source_unique=0,
+                  target_unique=0,
                   status_callback=None):
+    logging.info("SUMMARY_WRITER/print_summary: Starting")
+
     total_matches = len(matches)
     total_mismatches = len(mismatched)
     total_missing = len(missing)
-    logging.info("SUMMARY_WRITER/print_summary Starting")
+
     diag(f"Print Summary total matches: {total_matches} - total mismatches: {total_mismatches} - total missing: {total_missing}")
 
     from collections import Counter
@@ -67,17 +75,19 @@ def print_summary(matches,
         "=============== RECONCILIATION REPORT ===============",
         "",
         "Source Statistics:",
-        f"   Total Files in Source:   {source_count}",
-        f"   Total Files in Target:   {target_count}",
+        f"   Total Files in Source:      {source_count}",
+        f"   Total Files in Target:      {target_count}",
+        f"   Unique filenames in Source: {source_unique}",
+        f"   Unique filenames in Target: {target_unique}",
         "",
         "Reconciliation Results:",
-        f"   Total Exact Matches:     {total_matches}",
-        f"   Total Mismatches:        {total_mismatches}",
-        f"   Total Missing Files:     {total_missing}",
+        f"   Total Exact Matches:        {total_matches}",
+        f"   Total Mismatches:           {total_mismatches}",
+        f"   Total Missing Files:        {total_missing}",
         "",
-        f"   Multi-Match Cases:       {multi_match_cases}",
-        f"   Mixed Match/Mismatch:    {mixed_cases}",
-        ""
+        f"   Multi-Match Cases:          {multi_match_cases}",
+        f"   Mixed Match/Mismatch:       {mixed_cases}",
+        "",
         "====================================================="
     ]
 

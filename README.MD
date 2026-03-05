@@ -1,11 +1,30 @@
 # Reconciliation Tool — User Guide
 
-The Reconciliation Tool is a fast, reliable utility for comparing two folders of documents and identifying:
+The Reconciliation Tool is a fast, reliable utility for comparing two folders of documents to accomplish the following objectives:
+- The TARGET folder is meant to be the GOLD STANDARD for file system structure.  
+- SOURCE Folder
+Files that SHOULD exist in the TARGET
+May have different folder structures than TARGET 
+Represents files need to be reconciled in the TARGET
+-  TARGET
+Destination - being normalized over time 
+Gold standard LOCATION structure
+May have files in wrong locations
+May have duplicate copies
+May be missing files from SOURCE
 
 - Files that match exactly  
 - Files that exist in both folders but differ  
 - Files that are missing from one folder  
 - Files that appear in multiple locations  
+
+| Result      | Meaning                                  | Required Action                                              |
+|-------------|------------------------------------------|--------------------------------------------------------------|
+| Exact Match | SOURCE files exists correctly in TARGET  | Candidates to remove from SOURCE                             |
+| Missing     | SOURCE file not anywhere in the TARGET   | Candidates to move to correct TARGET location                |
+| Mismatch    | Same filename diffent content            | Reconcile GOLD STANDARD file, remove others                  |
+| Multi-Match | SOURCE file in multiple TARGET locations | Clean up multiple copies in TARGET locations                 |
+| Mixed       | Source TARGET copies match some don't    | Candidate to clean up duplicates and mixed content in SOURCE |
 
 It produces clear Excel, CSV, and text reports and can optionally delete or quarantine duplicate or outdated files.
 

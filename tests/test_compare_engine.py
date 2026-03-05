@@ -1,6 +1,11 @@
 # tests/test_compare_engine.py
 
+# System
+import os
 import pytest
+from unittest.mock import patch, MagicMock
+
+# Locals
 from unittest.mock import patch, MagicMock
 
 # -----------------------------
@@ -68,6 +73,10 @@ def test_returns_results_dict(folders):
     assert "matches" in results
     assert "mismatched" in results
     assert "missing" in results
+    assert "source_count" in results
+    assert "target_count" in results
+    assert "source_unique" in results
+    assert "target_unique" in results
 
 def test_returns_summary_string(folders):
     folderA, folderB, output = folders
@@ -322,7 +331,10 @@ def test_mixed_match_and_mismatch(folders, monkeypatch):
          patch(PATCH_SUMMARY, return_value=""), \
          patch(PATCH_DUMP, return_value=None), \
          patch(PATCH_SCANRES, return_value=None):
-        results, _ = make_call(folderA, folderB, output)
+        results, _ = make_call(folderA,
+                                folderB,
+                                output
+                                )
 
     # Should appear in both matches and mismatched
     assert len(results["matches"]) >= 1
@@ -337,9 +349,18 @@ def test_no_match_goes_to_missing(folders, monkeypatch):
     folderA, folderB, output = folders
 
     import src.config as config
-    monkeypatch.setattr(config, "HASH_ONLY_MODE", False)
-    monkeypatch.setattr(config, "HASH_COMPARE_MODE", False)
-    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(config,
+                        "HASH_ONLY_MODE",
+                        False
+                        )
+    monkeypatch.setattr(config,
+                        "HASH_COMPARE_MODE",
+                        False
+                        )
+    monkeypatch.setattr(config,
+                        "TIMESTAMPED_OUTPUT",
+                        False
+                        )
 
     import os
 
@@ -481,3 +502,63 @@ def test_file_with_no_candidates_goes_to_missing(folders, monkeypatch):
 
     missing_names = [m[0] for m in results["missing"]]
     assert "ghost.txt" in missing_names
+
+def test_returns_source_and_target_counts(folders, monkeypatch):
+    """Results dict should contain source and target file counts."""
+    folderA, folderB, output = folders
+
+    import src.config as config
+    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+
+    # Create 2 files in source, 3 in target
+    open(folderA + "/file1.txt", "w").write("content")
+    open(folderA + "/file2.txt", "w").write("content")
+    open(folderB + "/file1.txt", "w").write("content")
+    open(folderB + "/file2.txt", "w").write("content")
+    open(folderB + "/file3.txt", "w").write("content")
+
+    with patch(PATCH_WRITE, return_value=None), \
+            patch(PATCH_SUMMARY, return_value=""), \
+            patch(PATCH_DUMP, return_value=None), \
+            patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    assert "source_count" in results
+    assert "target_count" in results
+    assert "source_unique" in results
+    assert "target_unique" in results
+    assert results["source_count"] == 2
+    assert results["target_count"] == 3
+    assert results["source_unique"] == 2
+    assert results["target_unique"] == 3
+
+def test_compare_folders_handles_walk_error(folders, monkeypatch):
+    """Should handle os.walk failure gracefully and default counts to 0."""
+    folderA, folderB, output = folders
+
+    import src.config as config
+    import src.engine.compare_engine as engine_module
+    monkeypatch.setattr(config, "TIMESTAMPED_OUTPUT", False)
+
+    original_walk = os.walk
+    call_count = 0
+
+    def fake_walk(path, *args, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        # First 2 calls are scan_folder — let them succeed
+        # 3rd and 4th calls are os.walk counts — make them fail
+        if call_count >= 3:
+            raise OSError("Walk failed")
+        return original_walk(path, *args, **kwargs)
+
+    monkeypatch.setattr(engine_module.os, "walk", fake_walk)
+
+    with patch(PATCH_WRITE,   return_value=None), \
+         patch(PATCH_SUMMARY, return_value=""), \
+         patch(PATCH_DUMP,    return_value=None), \
+         patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    assert results["source_count"] == 0
+    assert results["target_count"] == 0

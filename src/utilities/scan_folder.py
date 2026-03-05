@@ -32,20 +32,20 @@ def scan_folder(folder, multi=False):
 
 
 def dump_scan_results(filesA, filesB):
-    print("\n================ SCAN RESULTS ================")
+    diag("\n================ SCAN RESULTS ================")
     diag(f"Scan Source files = {len(filesA)}")
     diag(f"Scan Target files = {len(filesB)}")
 
-    print("\n--- FILES A ---")
+    diag("\n--- FILES A ---")
     for key, value in filesA.items():
-        print(f"  A key: {key}")
-        print(f"    {value}")
+        diag(f"  A key: {key}")
+        diag(f"    {value}")
 
-    print("\n--- FILES B ---")
+    diag("\n--- FILES B ---")
     for key, value in filesB.items():
-        print(f"  B key: {key}")
+        diag(f"  B key: {key}")
         for entry in value:
-            print(f"    {entry}")
+            diag(f"    {entry}")
 
-    print("\n==============================================\n")
+    diag("\n==============================================\n")
     diag("Dump Scan Results: ")

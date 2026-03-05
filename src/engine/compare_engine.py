@@ -10,7 +10,9 @@ results = {
 '''
 
 # System
+import os
 import config
+import logging
 
 #local
 from utilities.logging_setup import dump_diagnostics
@@ -32,6 +34,7 @@ def compare_folders_recursive(folderA,
                               return_summary=True
                               ):
     diag("COMPARE_ENGINE/compare_folders_recursive: Starting compare_folders_recursive")
+
     # Apply timestamped output behavior ONCE
     if config.TIMESTAMPED_OUTPUT:
         output_dir = create_timestamped_folder(output_dir)
@@ -43,8 +46,19 @@ def compare_folders_recursive(folderA,
     filesA = scan_folder(folderA, multi=False)
     filesB = scan_folder(folderB, multi=True)
 
-    diag(f"SCAN: FolderA files = {len(filesA)}")
-    diag(f"SCAN: FolderB files = {len(filesB)}")
+    # Count actual physical files using os.walk
+    try:
+        source_count = sum(len(files) for _, _, files in os.walk(folderA))
+        target_count = sum(len(files) for _, _, files in os.walk(folderB))
+    except Exception as error:
+        logging.error(f"Error counting files: {error}")
+        source_count = 0
+        target_count = 0
+
+    diag(f"SCAN: FolderA physical files = {source_count}")
+    diag(f"SCAN: FolderB physical files = {target_count}")
+    diag(f"SCAN: FolderA unique filenames = {len(filesA)}")
+    diag(f"SCAN: FolderB unique filenames = {len(filesB)}")
 
     dump_scan_results(filesA, filesB)
 
@@ -162,7 +176,9 @@ def compare_folders_recursive(folderA,
         "mismatched": mismatched,
         "missing": missing,
         "source_count" : len(filesA),
-        "target_count" : len(filesB)
+        "target_count" : len(filesB),
+        "source_unique" : len(filesA),
+        "target_unique" : len(filesB)
     }
     diag("COMPARE_ENGINE/compare_folders_recursive: Ending compare_folders_recursive")
     # Build Summary Report
