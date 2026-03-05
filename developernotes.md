@@ -135,7 +135,15 @@ searchdocuments/
 ├── pytest.ini                   # pytest settings
 └── README.md                    # User documentation
 ```
-
+## Smoke Test Data Expected Results
+| Scenario | Src Files | Tgt Files | Matches | Mismatches | Missing | Multi | Mixed |
+|--------- | --------- | --------- | ------- | ---------- |---------| ----- | ----- |
+| 1-Identical | 4 | 4 | 4 | 0 | 0 | 1 | 0 |
+| 2-Mixed | 13 | 12 | 7 | 2 | 1 | 2 | 1 |
+| 3-Empty Source | 0 | 4 | 0 | 0 | 0 | 0 | 0 |
+| 4-Empty Target | 4 | 0| 0 | 0 | 2 | 0 | 0 |
+| 5-Deep Nested | 2 | 2 | 2 | 0 | 0 | 0 | 0 |
+| 6=Special Chars | 7 | 7 | 7 | 0 | 0 | 0 | 0 |
 ---
 
 ## Development Environment Setup

@@ -149,3 +149,9 @@ def run_cli():
         sys.exit(1)
 
     diag("CLI_MAIN/run_cli: End run reconciliation process")
+
+# ---------------------------------------------------------
+# ENTRY POINT
+# ---------------------------------------------------------
+if __name__ == "__main__":
+    run_cli()
