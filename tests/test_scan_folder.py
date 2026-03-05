@@ -102,7 +102,6 @@ def test_scan_folder_multi_mode_empty_folder(tmp_path):
 # dump_scan_results tests
 # -----------------------------
 def test_dump_scan_results_runs_without_error(tmp_path, caplog):
-    import config
     # capsys is a pytest built-in that captures print output
     config.DIAGNOSTIC_MODE = True
     filesA = {"file1.txt": (str(tmp_path / "file1.txt"), 100, 1000.0)}
@@ -114,7 +113,6 @@ def test_dump_scan_results_runs_without_error(tmp_path, caplog):
     config.DIAGNOSTIC_MODE = False
 
 def test_dump_scan_results_shows_keys(tmp_path, caplog):
-    import config
     config.DIAGNOSTIC_MODE = True
     filesA = {"myfile.txt": (str(tmp_path / "myfile.txt"), 200, 2000.0)}
     filesB = {}

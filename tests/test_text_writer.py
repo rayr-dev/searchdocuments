@@ -39,7 +39,7 @@ def test_txt_has_section_headers(tmp_path):
 def test_txt_empty_data_has_only_headers(tmp_path):
     write_text_output(str(tmp_path), [], [], [])
     content = read_txt(str(tmp_path / "comparison.txt"))
-    lines = [l for l in content.splitlines() if l.strip()]
+    lines = [line for line in content.splitlines() if line.strip()]
     assert len(lines) == 3  # only the 3 section headers
 
 # -----------------------------
@@ -187,4 +187,3 @@ def test_txt_writes_all_types(sample_files):
     assert "match.txt" in content
     assert "mismatch.txt" in content
     assert "missing.txt" in content
-    

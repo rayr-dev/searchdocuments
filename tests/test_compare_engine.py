@@ -6,7 +6,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 # Locals
-from unittest.mock import patch, MagicMock
 
 # -----------------------------
 # Shared test fixtures
@@ -188,7 +187,8 @@ def test_hash_only_mode_match(folders, monkeypatch):
     open(folderA + "/file.txt", "w").write("identical content")
     open(folderB + "/file.txt", "w").write("identical content")
 
-    import os, time
+    import os
+    import time
     time.sleep(0.1)
     os.utime(folderB + "/file.txt", None)  # bump mtime on B
 
@@ -375,6 +375,34 @@ def test_accurate_mode_timestamp_match_rejected_by_hash(folders, monkeypatch):
         results, _ = make_call(folderA, folderB, output)
 
     assert len(results["mismatched"]) == 1
+
+def test_accurate_mode_timestamp_and_hash_match(folders, monkeypatch):
+    """Same size, same timestamp, same content — hash confirms match."""
+    folderA, folderB, output = folders
+
+    import src.engine.compare_engine as engine_module
+    import os
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", True)
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
+
+    # Same content = same hash
+    open(folderA + "/file.txt", "w").write("identical content")
+    open(folderB + "/file.txt", "w").write("identical content")
+
+    # Force same mtime so timestamp check passes
+    mtime_a = os.path.getmtime(folderA + "/file.txt")
+    os.utime(folderB + "/file.txt", (mtime_a, mtime_a))
+
+    with patch(PATCH_WRITE,   return_value=None), \
+         patch(PATCH_SUMMARY, return_value=""), \
+         patch(PATCH_DUMP,    return_value=None), \
+         patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    assert len(results["matches"]) == 1
+
 # -----------------------------
 # Mixed match + mismatch tests
 # Lines 84-89, 100
@@ -393,7 +421,6 @@ def test_mixed_match_and_mismatch(folders, monkeypatch):
     # Create file in A
     open(folderA + "/file.txt", "w").write("original")
     mtime_a = os.path.getmtime(folderA + "/file.txt")
-    size_a  = os.path.getsize(folderA + "/file.txt")
 
     # Create matching copy in B subfolder 1
     sub1 = folderB + "/sub1"

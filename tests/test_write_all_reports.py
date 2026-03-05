@@ -1,7 +1,6 @@
 # tests/test_write_all_reports.py
 
 import os
-import pytest
 from unittest.mock import MagicMock, patch
 from src.writers.write_all_reports import write_all_reports
 

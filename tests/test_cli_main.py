@@ -3,8 +3,7 @@
 import sys
 import pytest
 
-from unittest.mock import patch, MagicMock
-import src.config as config
+from unittest.mock import patch
 from src.cli.cli_main import build_parser, run_cli
 
 # -----------------------------
@@ -17,14 +16,22 @@ def make_args(folderA="src", folderB="src", output="src",
               diag=False):
     """Build a sys.argv list for testing."""
     args = ["cli_main.py", folderA, folderB, "-o", output]
-    if hash:           args.append("--hash")
-    if hashonly:       args.append("--hashonly")
-    if findall:        args.append("--findall")
-    if dryrun:         args.append("--dryrun")
-    if deletematches:  args.append("--deletematches")
-    if deletecandidates: args.append("--deletecandidates")
-    if quarantine:     args.append("--quarantine")
-    if diag:           args.append("--diag")
+    if hash:
+        args.append("--hash")
+    if hashonly:
+        args.append("--hashonly")
+    if findall:
+        args.append("--findall")
+    if dryrun:
+        args.append("--dryrun")
+    if deletematches:
+        args.append("--deletematches")
+    if deletecandidates:
+        args.append("--deletecandidates")
+    if quarantine:
+        args.append("--quarantine")
+    if diag:
+        args.append("--diag")
     return args
 
 # -----------------------------
@@ -58,60 +65,60 @@ def test_build_parser_output_required():
 def test_build_parser_hash_flag_default_false():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output"])
-    assert args.hash == False
+    assert not args.hash
 
 def test_build_parser_hash_flag_true():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--hash"])
-    assert args.hash == True
+    assert args.hash
 
 def test_build_parser_hashonly_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--hashonly"])
-    assert args.hashonly == True
+    assert args.hashonly
 
 def test_build_parser_findall_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--findall"])
-    assert args.findall == True
+    assert args.findall
 
 def test_build_parser_dryrun_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--dryrun"])
-    assert args.dryrun == True
+    assert args.dryrun
 
 def test_build_parser_deletematches_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--deletematches"])
-    assert args.deletematches == True
+    assert args.deletematches
 
 def test_build_parser_deletecandidates_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--deletecandidates"])
-    assert args.deletecandidates == True
+    assert args.deletecandidates
 
 def test_build_parser_quarantine_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--quarantine"])
-    assert args.quarantine == True
+    assert args.quarantine
 
 def test_build_parser_diag_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--diag"])
-    assert args.diag == True
+    assert args.diag
 
 def test_build_parser_all_flags_default_false():
     """All optional flags should default to False."""
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output"])
-    assert args.hash == False
-    assert args.hashonly == False
-    assert args.findall == False
-    assert args.dryrun == False
-    assert args.deletematches == False
-    assert args.deletecandidates == False
-    assert args.quarantine == False
-    assert args.diag == False
+    assert not args.hash
+    assert not args.hashonly
+    assert not args.findall
+    assert not args.dryrun
+    assert not args.deletematches
+    assert not args.deletecandidates
+    assert not args.quarantine
+    assert not args.diag
 
 # -----------------------------
 # run_cli config mapping tests
@@ -131,7 +138,7 @@ def test_run_cli_sets_hash_only_mode(tmp_path, monkeypatch):
          patch(PATCH_INIT,      return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.HASH_ONLY_MODE == True
+    assert cli_mod.config.HASH_ONLY_MODE
 
 def test_run_cli_sets_hash_compare_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -144,7 +151,7 @@ def test_run_cli_sets_hash_compare_mode(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.HASH_COMPARE_MODE == True
+    assert cli_mod.config.HASH_COMPARE_MODE
 
 def test_run_cli_sets_dry_run(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -157,7 +164,7 @@ def test_run_cli_sets_dry_run(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.DRY_RUN == True
+    assert cli_mod.config.DRY_RUN
 
 def test_run_cli_sets_find_all(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -170,7 +177,7 @@ def test_run_cli_sets_find_all(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.FIND_ALL_LOCATIONS_MODE == True
+    assert cli_mod.config.FIND_ALL_LOCATIONS_MODE
 
 def test_run_cli_sets_delete_matches(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -183,7 +190,7 @@ def test_run_cli_sets_delete_matches(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.DELETE_EXACT_MATCHES == True
+    assert cli_mod.config.DELETE_EXACT_MATCHES
 
 def test_run_cli_sets_delete_candidates(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -196,7 +203,7 @@ def test_run_cli_sets_delete_candidates(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.DELETE_CANDIDATES == True
+    assert cli_mod.config.DELETE_CANDIDATES
 
 def test_run_cli_sets_quarantine(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -209,7 +216,7 @@ def test_run_cli_sets_quarantine(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.USE_QUARANTINE == True
+    assert cli_mod.config.USE_QUARANTINE
 
 def test_run_cli_sets_diagnostic_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",
@@ -222,7 +229,7 @@ def test_run_cli_sets_diagnostic_mode(tmp_path, monkeypatch):
          patch(PATCH_INIT, return_value=None):
         run_cli()
     import src.cli.cli_main as cli_mod
-    assert cli_mod.config.DIAGNOSTIC_MODE == True
+    assert cli_mod.config.DIAGNOSTIC_MODE
 
 def test_run_cli_calls_reconciliation(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv",

@@ -223,16 +223,6 @@ def test_get_version_info_returns_correct_dict(tmp_path, monkeypatch):
     result = get_version_info()
     assert result == expected
 
-def fake_open(path, *args, **kwargs):
-    if "app_version.json" in str(path):
-        return original_open(str(version_file), *args, **kwargs)
-    return original_open(path, *args, **kwargs)
-
-    monkeypatch.setattr(builtins, "open", fake_open)
-
-    result = get_version_info()
-    assert result == expected
-
 def test_get_version_info_returns_defaults_when_file_missing(monkeypatch):
     """Should return default dict if app_version.json not found."""
     import src.utilities.path_utils as path_utils_module

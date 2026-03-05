@@ -1,8 +1,6 @@
 # tests/test_safe_delete.py
 
 import os
-import pytest
-from unittest.mock import patch
 from src.utilities.safe_delete import safe_delete, move_to_quarantine, handle_delete
 
 

@@ -181,10 +181,8 @@ def test_csv_match_handles_timestamp_error(tmp_path, monkeypatch):
     fileA.write_text("content")
     fileB.write_text("content")
 
-    original_getmtime = os.path.getmtime
-
     def fake_getmtime(path):
-        raise OSError("Permission denied")
+            raise OSError("Permission denied")
 
     monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
 

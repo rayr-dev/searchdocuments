@@ -158,8 +158,8 @@ def compare_folders_recursive(folderA,
                 diag(f"NO MATCH FOUND - MISMATCHED: {rel}")
                 mismatched.append((rel, pathA, mismatch_list))
             else:
-                diag(f"NO MATCH and NO MISMATCH: {rel}")  # ← accurate
-                missing.append((rel, pathA)) # pragma: no cover# pragma: no cover
+                diag(f"NO MATCH and NO MISMATCH: {rel}") # pragma: no cover
+                missing.append((rel, pathA)) # pragma: no cover
 
     if progress_callback:
         progress_callback(50)

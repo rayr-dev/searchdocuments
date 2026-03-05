@@ -1,7 +1,6 @@
 # tests/test_summary_writer.py
 
 import os
-import pytest
 from unittest.mock import MagicMock
 from src.writers.summary_writer import build_summary, print_summary
 
