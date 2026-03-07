@@ -366,7 +366,11 @@ def launch_gui(root, info):
         config.USE_QUARANTINE = quarantine_var.get()
         config.DIAGNOSTIC_MODE = diagnostics_var.get()
 
-        log_path = init_logging(output_dir, diagnostic=config.DIAGNOSTIC_MODE)
+        # Create timestamped folder FIRST so log goes inside it
+        from utilities.output import create_timestamped_folder
+        timestamped_dir = create_timestamped_folder(output_dir)
+
+        log_path = init_logging(timestamped_dir, diagnostic=config.DIAGNOSTIC_MODE)
         logging.info(f"GUI Log file created: {log_path}")
         diag("Run button clicked")
         diag(f"FolderA: [{folderA}]")
@@ -381,6 +385,7 @@ def launch_gui(root, info):
         diag(f"Quarantine: [{config.USE_QUARANTINE}]")
         diag(f"Find All Files: [{config.FIND_ALL_LOCATIONS_MODE}]")
 
+        config.TIMESTAMPED_OUTPUT = False  # ← folder already created
         try:
             set_status("Starting comparison...")
             set_progress(0)
@@ -388,7 +393,7 @@ def launch_gui(root, info):
             results, summary_text = run_reconciliation(
                 folderA,
                 folderB,
-                output_dir,
+                timestamped_dir,
                 progress_callback=set_progress,
                 status_callback=set_status
             )

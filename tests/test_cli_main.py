@@ -244,9 +244,11 @@ def test_run_cli_calls_reconciliation(tmp_path, monkeypatch):
     assert mock_reconcile.called
 
 def test_run_cli_passes_correct_folders(tmp_path, monkeypatch):
+    import os
     folderA = str(tmp_path / "source")
     folderB = str(tmp_path / "target")
     output  = str(tmp_path / "output")
+    os.makedirs(output)
     monkeypatch.setattr(sys, "argv",
                         make_args(folderA=folderA,
                                   folderB=folderB,
@@ -259,7 +261,7 @@ def test_run_cli_passes_correct_folders(tmp_path, monkeypatch):
     args, kwargs = mock_reconcile.call_args
     assert args[0] == folderA
     assert args[1] == folderB
-    assert args[2] == output
+    assert args[2].startswith(output)
 
 # -----------------------------
 # Error handling tests
@@ -294,7 +296,7 @@ def test_run_cli_prints_summary(tmp_path, monkeypatch, capsys):
 def test_cli_main_entry_point():
     """Test that __main__ block exists and calls run_cli."""
     import ast
-    source = open("src/cli/cli_main.py").read()
+    source = open("src/cli/cli_main.py",encoding="utf-8").read()
     tree = ast.parse(source)
 
     # Find if __name__ == "__main__": run_cli() exists

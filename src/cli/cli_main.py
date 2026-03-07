@@ -85,6 +85,7 @@ def build_parser():
         help="Enable diagnostic output"
     )
     diag("CLI_MAIN/build_parser: Ending build_parser")
+
     return parser
 
 
@@ -93,14 +94,18 @@ def run_cli():
     parser = build_parser()
     args = parser.parse_args()
 
+    #If version info passed display version and exit
+    from utilities.output import create_timestamped_folder
+    timestamped_dir = create_timestamped_folder(args.output)
     # Initialize logging for CLI
-    log_path = init_logging(args.output,
-                            diagnostic=args.diag
-                            )
+    log_path = init_logging(timestamped_dir, diagnostic=args.diag)
+    ...
     diag(f"Log file: {log_path}")
+
 
     # Reset config
     config.initialize_runtime()
+    config.TIMESTAMPED_OUTPUT = False  # ← tell engine folder already created
 
     # Apply comparison modes
     config.HASH_ONLY_MODE = args.hashonly
@@ -135,11 +140,11 @@ def run_cli():
         results, summary_text = run_reconciliation(
             args.folderA,
             args.folderB,
-            args.output,
+            timestamped_dir,
             progress_callback=None,
             status_callback=None
         )
-        logging.info(f"Reports written to: {args.output}")
+        logging.info(f"Reports written to: {timestamped_dir}")
         # Print Summary after successful run
         print(summary_text)
 

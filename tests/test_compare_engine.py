@@ -667,3 +667,28 @@ def test_compare_folders_handles_walk_error(folders, monkeypatch):
 
     assert results["source_count"] == 0
     assert results["target_count"] == 0
+
+def test_timestamped_output_creates_subfolder(folders, monkeypatch):
+    """When TIMESTAMPED_OUTPUT=True engine creates timestamped subfolder."""
+    folderA, folderB, output = folders
+
+    import src.engine.compare_engine as engine_module
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT", True)
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE", False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE", False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
+
+    open(folderA + "/file.txt", "w").write("content")
+    open(folderB + "/file.txt", "w").write("content")
+
+    with patch(PATCH_WRITE,   return_value=None), \
+         patch(PATCH_SUMMARY, return_value=""), \
+         patch(PATCH_DUMP,    return_value=None), \
+         patch(PATCH_SCANRES, return_value=None):
+        results, _ = make_call(folderA, folderB, output)
+
+    # Verify a timestamped subfolder was created inside output
+    import os
+    subfolders = os.listdir(output)
+    assert len(subfolders) == 1
+    assert len(subfolders[0]) == 15  # YYYYMMDD_HHMMSS format
