@@ -34,7 +34,7 @@ def main():
     # Optional PyInstaller splash
     # -----------------------------
     # Only attempts splash if frozen
-    logging.info("{DEBUG_MODULE} main: Beginning GUI entry point")
+
     if getattr(sys, 'frozen', False):
         try:
             import pyi_splash
@@ -42,7 +42,7 @@ def main():
             time.sleep(1)  # delay in seconds
             pyi_splash.close()
         except Exception as error:
-            logging.error(f"[gui_main] Exception error launching splash screen - [{error}]")
+            print(f"[gui_main] Exception error launching splash screen - [{error}]")
             pass
         # -----------------------------
         # # Step 1 - read version first
@@ -50,7 +50,6 @@ def main():
 
     version = get_version()
     info = get_version_info()
-    diag(f"Version Information: Version Info [{info}]")
 
     # -----------------------------
     # Main Window
@@ -372,6 +371,9 @@ def launch_gui(root, info):
 
         log_path = init_logging(timestamped_dir, diagnostic=config.DIAGNOSTIC_MODE)
         logging.info(f"GUI Log file created: {log_path}")
+
+        logging.info(f"GUI started - Log file created: {log_path}")  # ← move here
+
         diag("Run button clicked")
         diag(f"FolderA: [{folderA}]")
         diag(f"FolderB: [{folderB}]")
