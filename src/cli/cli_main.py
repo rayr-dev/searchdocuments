@@ -4,6 +4,7 @@ The purpose of this module is to process the Search Documents using the CLI Inte
 '''
 
 # System
+import os
 import sys
 import argparse
 import logging
@@ -93,6 +94,15 @@ def run_cli():
     diag("CLI_MAIN/run_cli: Starting run reconciliation process")
     parser = build_parser()
     args = parser.parse_args()
+
+    # Validate and create output folder if needed
+    if not os.path.isdir(args.output):
+        try:
+            os.makedirs(args.output)
+            print(f"Created output folder: {args.output}")
+        except Exception as error:
+            print(f"ERROR: Could not create output folder: {args.output} ({error})")
+            sys.exit(1)
 
     #If version info passed display version and exit
     from utilities.output import create_timestamped_folder
