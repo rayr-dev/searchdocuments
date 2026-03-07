@@ -76,6 +76,7 @@ def compare_folders_recursive(folderA,
 
         candidatesB = filesB.get(rel, [])
         if not candidatesB:
+            diag(f"NO CANDIDATES FOUND - MISSING: {rel}")
             missing.append((rel, pathA))
             continue
 

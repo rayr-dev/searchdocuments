@@ -317,3 +317,43 @@ def test_cli_main_entry_point():
                         found = True
 
     assert found, "cli_main.py missing if __name__ == '__main__': run_cli()"
+def test_run_cli_creates_output_folder_if_missing(tmp_path, monkeypatch):
+    """CLI should create output folder if it does not exist."""
+    import os
+    folderA = str(tmp_path / "source")
+    folderB = str(tmp_path / "target")
+    output  = str(tmp_path / "new_output")  # ← does not exist yet
+    os.makedirs(folderA)
+    os.makedirs(folderB)
+
+    monkeypatch.setattr(sys, "argv",
+                        make_args(folderA=folderA,
+                                  folderB=folderB,
+                                  output=output))
+    with patch(PATCH_RECONCILE, return_value=({}, "summary")), \
+         patch(PATCH_LOGGING,   return_value=str(tmp_path / "test.log")):
+        run_cli()
+
+    assert os.path.isdir(output)  # ← folder was created
+
+
+def test_run_cli_exits_if_output_folder_cannot_be_created(tmp_path, monkeypatch):
+    """CLI should print error and exit if output folder cannot be created."""
+    import os
+    folderA = str(tmp_path / "source")
+    folderB = str(tmp_path / "target")
+    output  = str(tmp_path / "new_output")
+    os.makedirs(folderA)
+    os.makedirs(folderB)
+
+    monkeypatch.setattr(sys, "argv",
+                        make_args(folderA=folderA,
+                                  folderB=folderB,
+                                  output=output))
+
+    with patch("src.cli.cli_main.os.makedirs",
+               side_effect=OSError("Permission denied")), \
+         pytest.raises(SystemExit) as exc_info:
+        run_cli()
+
+    assert exc_info.value.code == 1
