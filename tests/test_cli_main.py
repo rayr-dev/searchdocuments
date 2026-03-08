@@ -6,6 +6,18 @@ import pytest
 from unittest.mock import patch
 from src.cli.cli_main import build_parser, run_cli
 
+@pytest.fixture(autouse=True)
+def patch_version_info():
+    """Patch get_version_info so build_parser works without app_version.json."""
+    with patch("src.utilities.path_utils.get_version_info",
+               return_value={
+                   "version": "1.0.0",
+                   "build": "20260302",
+                   "author": "Test",
+                   "description": "Test",
+                   "release": "Test"
+               }):
+        yield
 # -----------------------------
 # Helper to simulate CLI args
 # -----------------------------
@@ -106,6 +118,16 @@ def test_build_parser_diag_flag():
     parser = build_parser()
     args = parser.parse_args(["pathA", "pathB", "-o", "output", "--diag"])
     assert args.diag
+
+def test_build_parser_version_flag(capsys):
+    """--version should print version string and exit."""
+    with pytest.raises(SystemExit) as exc_info:
+        build_parser().parse_args(["--version"])
+    assert exc_info.value.code == 0
+    captured = capsys.readouterr()
+    assert "Search Documents Tool" in captured.out
+    assert "v1.0.0" in captured.out
+    assert "Build:" in captured.out
 
 def test_build_parser_all_flags_default_false():
     """All optional flags should default to False."""

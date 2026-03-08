@@ -13,12 +13,26 @@ import config
 #Local
 from orchestrator import run_reconciliation
 from utilities.logging_setup import init_logging, diag
+from utilities.path_utils import get_version_info
 
 
 def build_parser():
     diag("CLI_MAIN/build_parser: Starting build_parser")
     parser = argparse.ArgumentParser(
         description="Search Documents Tool - Command Line Interface"
+    )
+
+    # Version Info
+    info = get_version_info()
+    version_str = f"Search Documents Tool v{info['version']} (Build: {info['build']})"
+
+    parser = argparse.ArgumentParser(
+        description="Search Documents Tool - Command Line Interface"
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=version_str
     )
 
     parser.add_argument("folderA",
