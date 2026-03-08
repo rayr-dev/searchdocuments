@@ -1,110 +1,188 @@
 @echo off
-REM post_build_test.cmd
-REM Runs after successful build to validate executable behavior
+setlocal enabledelayedexpansion
 
 echo ================================================
-echo  Post-Build Integration Tests
+echo  Search Documents - Post Build Smoke Tests
 echo ================================================
 echo.
 
-SET CLI=dist\Search-documents_CLI.exe
-SET TESTDATA=testdata
-SET REPORTS=%TESTDATA%\reports
-SET PASS=0
-SET FAIL=0
+REM ------------------------------------------------
+REM Configuration
+REM ------------------------------------------------
+set CLI=python src\cli\cli_main.py
+set TESTDATA=testdata
+set REPORTS=testdata\reports\smoketest
+set PASS_COUNT=0
+set FAIL_COUNT=0
+set FAIL_LIST=
 
 REM ------------------------------------------------
-REM Test 1 - Same Data (all matches)
+REM Helper: Run scenario and extract summary values
 REM ------------------------------------------------
-echo [TEST 1] Same Data - All Exact Matches...
-%CLI% %TESTDATA%\scenario1_same\source %TESTDATA%\scenario1_same\target -o %REPORTS%\scenario1
+REM Usage: call :run_scenario <name> <source> <target> <flags>
+REM Results stored in SUMMARY_TEXT variable
+
+REM ------------------------------------------------
+REM Regenerate test data
+REM ------------------------------------------------
+echo [SETUP] Regenerating test data...
+python tools\create_testdata.py --clean --base %TESTDATA%
 if %ERRORLEVEL% NEQ 0 (
-    echo FAILED: Test 1 - CLI returned error
-    set /a FAIL+=1
-) else (
-    REM Validate summary output contains expected results
-    findstr /c:"Total Exact Matches:" %REPORTS%\scenario1\summary.txt
-    if %ERRORLEVEL% NEQ 0 (
-        echo FAILED: Test 1 - Summary not generated
-        set /a FAIL+=1
-    ) else (
-        echo PASSED: Test 1
-        set /a PASS+=1
-    )
-)
-echo.
-
-REM ------------------------------------------------
-REM Test 2 - Mixed with Find All Files
-REM ------------------------------------------------
-echo [TEST 2] Mixed - Find All Files enabled...
-%CLI% %TESTDATA%\scenario2_mixed\source %TESTDATA%\scenario2_mixed\target -o %REPORTS%\scenario2 --findall
-if %ERRORLEVEL% NEQ 0 (
-    echo FAILED: Test 2 - CLI returned error
-    set /a FAIL+=1
-) else (
-    echo PASSED: Test 2
-    set /a PASS+=1
-)
-echo.
-
-REM ------------------------------------------------
-REM Test 3 - Empty Source
-REM ------------------------------------------------
-echo [TEST 3] No Data - Empty Source...
-%CLI% %TESTDATA%\scenario3_empty_source\source %TESTDATA%\scenario3_empty_source\target -o %REPORTS%\scenario3
-if %ERRORLEVEL% NEQ 0 (
-    echo FAILED: Test 3 - CLI returned error
-    set /a FAIL+=1
-) else (
-    echo PASSED: Test 3
-    set /a PASS+=1
-)
-echo.
-
-REM ------------------------------------------------
-REM Test 4 - Empty Target
-REM ------------------------------------------------
-echo [TEST 4] No Data - Empty Target...
-%CLI% %TESTDATA%\scenario4_empty_target\source %TESTDATA%\scenario4_empty_target\target -o %REPORTS%\scenario4
-if %ERRORLEVEL% NEQ 0 (
-    echo FAILED: Test 4 - CLI returned error
-    set /a FAIL+=1
-) else (
-    echo PASSED: Test 4
-    set /a PASS+=1
-)
-echo.
-
-REM ------------------------------------------------
-REM Test 5 - Mixed Find All Files disabled
-REM ------------------------------------------------
-echo [TEST 5] Mixed - Find All Files disabled...
-%CLI% %TESTDATA%\scenario5_mixed_no_findall\source %TESTDATA%\scenario5_mixed_no_findall\target -o %REPORTS%\scenario5
-if %ERRORLEVEL% NEQ 0 (
-    echo FAILED: Test 5 - CLI returned error
-    set /a FAIL+=1
-) else (
-    echo PASSED: Test 5
-    set /a PASS+=1
-)
-echo.
-
-REM ------------------------------------------------
-REM Test Summary
-REM ------------------------------------------------
-echo ================================================
-echo  Integration Test Results
-echo ================================================
-echo  Passed: %PASS%
-echo  Failed: %FAIL%
-echo ================================================
-
-if %FAIL% GTR 0 (
-    echo WARNING: Some integration tests failed!
-    echo Review reports in %REPORTS%
+    echo FAILED: Could not generate test data.
     exit /b 1
 )
+echo DONE: Test data ready.
+echo.
 
-echo All integration tests passed!
-exit /b 0
+REM ------------------------------------------------
+REM Clean previous smoke test reports
+REM ------------------------------------------------
+if exist %REPORTS% (
+    rmdir /s /q %REPORTS%
+)
+mkdir %REPORTS%
+
+REM ================================================
+REM SCENARIO 1 - Identical Files
+REM ================================================
+echo [S1] Scenario 1 - Identical Files...
+set S=scenario1_same
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S% --findall > %REPORTS%\%S%_output.txt 2>&1
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Total Files in Source:      9" "S1-SrcFiles"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Total Files in Target:      9" "S1-TgtFiles"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Unique filenames in Source: 5" "S1-SrcUniq"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Unique filenames in Target: 5" "S1-TgtUniq"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Total Exact Matches:        9" "S1-Matches"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Total Mismatches:           0" "S1-Mismatches"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Total Missing Files:        0" "S1-Missing"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Multi-Match Cases:          3" "S1-Multi"
+call :check_result "S1" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       0" "S1-Mixed"
+echo.
+
+REM ================================================
+REM SCENARIO 2 - Mixed Results
+REM ================================================
+echo [S2] Scenario 2 - Mixed Results...
+set S=scenario2_mixed
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S% --findall > %REPORTS%\%S%_output.txt 2>&1
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Total Files in Source:      18" "S2-SrcFiles"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Total Files in Target:      17" "S2-TgtFiles"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Unique filenames in Source: 8"  "S2-SrcUniq"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Unique filenames in Target: 7"  "S2-TgtUniq"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Total Exact Matches:        11" "S2-Matches"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Total Mismatches:           3"  "S2-Mismatches"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Total Missing Files:        1"  "S2-Missing"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Multi-Match Cases:          4"  "S2-Multi"
+call :check_result "S2" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       0"  "S2-Mixed"
+echo.
+
+REM ================================================
+REM SCENARIO 3 - Empty Source
+REM ================================================
+echo [S3] Scenario 3 - Empty Source...
+set S=scenario3_empty_source
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S% --findall > %REPORTS%\%S%_output.txt 2>&1
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Total Files in Source:      0" "S3-SrcFiles"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Total Files in Target:      6" "S3-TgtFiles"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Unique filenames in Source: 0" "S3-SrcUniq"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Unique filenames in Target: 4" "S3-TgtUniq"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Total Exact Matches:        0" "S3-Matches"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Total Mismatches:           0" "S3-Mismatches"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Total Missing Files:        0" "S3-Missing"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Multi-Match Cases:          0" "S3-Multi"
+call :check_result "S3" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       0" "S3-Mixed"
+echo.
+
+REM ================================================
+REM SCENARIO 4 - Empty Target
+REM ================================================
+echo [S4] Scenario 4 - Empty Target...
+set S=scenario4_empty_target
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S% --findall > %REPORTS%\%S%_output.txt 2>&1
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Total Files in Source:      6" "S4-SrcFiles"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Total Files in Target:      0" "S4-TgtFiles"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Unique filenames in Source: 4" "S4-SrcUniq"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Unique filenames in Target: 0" "S4-TgtUniq"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Total Exact Matches:        0" "S4-Matches"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Total Mismatches:           0" "S4-Mismatches"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Total Missing Files:        4" "S4-Missing"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Multi-Match Cases:          0" "S4-Multi"
+call :check_result "S4" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       0" "S4-Mixed"
+echo.
+
+REM ================================================
+REM SCENARIO 5 - Deep Nested
+REM ================================================
+echo [S5] Scenario 5 - Deep Nested...
+set S=scenario5_deep_nested
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S% --findall > %REPORTS%\%S%_output.txt 2>&1
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Total Files in Source:      5" "S5-SrcFiles"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Total Files in Target:      5" "S5-TgtFiles"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Unique filenames in Source: 5" "S5-SrcUniq"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Unique filenames in Target: 5" "S5-TgtUniq"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Total Exact Matches:        5" "S5-Matches"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Total Mismatches:           0" "S5-Mismatches"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Total Missing Files:        0" "S5-Missing"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Multi-Match Cases:          0" "S5-Multi"
+call :check_result "S5" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       0" "S5-Mixed"
+echo.
+
+REM ================================================
+REM SCENARIO 6 - Special Characters
+REM ================================================
+echo [S6] Scenario 6 - Special Characters...
+set S=scenario6_special_chars
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S% --findall > %REPORTS%\%S%_output.txt 2>&1
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Total Files in Source:      9" "S6-SrcFiles"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Total Files in Target:      9" "S6-TgtFiles"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Unique filenames in Source: 9" "S6-SrcUniq"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Unique filenames in Target: 9" "S6-TgtUniq"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Total Exact Matches:        9" "S6-Matches"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Total Mismatches:           0" "S6-Mismatches"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Total Missing Files:        0" "S6-Missing"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Multi-Match Cases:          0" "S6-Multi"
+call :check_result "S6" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       0" "S6-Mixed"
+echo.
+
+REM ================================================
+REM RESULTS SUMMARY
+REM ================================================
+echo ================================================
+echo  Smoke Test Results
+echo ================================================
+echo.
+echo   PASSED: %PASS_COUNT%
+echo   FAILED: %FAIL_COUNT%
+echo.
+
+if %FAIL_COUNT% GTR 0 (
+    echo Failed checks:
+    for %%F in (%FAIL_LIST%) do echo   - %%F
+    echo.
+    echo SMOKE TESTS FAILED
+    exit /b 1
+) else (
+    echo All smoke tests PASSED!
+    exit /b 0
+)
+
+REM ================================================
+REM Subroutine: check_result
+REM Usage: call :check_result <scenario> <file> <expected_string> <check_name>
+REM ================================================
+:check_result
+set _SCENARIO=%~1
+set _FILE=%~2
+set _EXPECTED=%~3
+set _NAME=%~4
+
+findstr /c:"%_EXPECTED%" "%_FILE%" > nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo   PASS [%_NAME%]: %_EXPECTED%
+    set /a PASS_COUNT+=1
+) else (
+    echo   FAIL [%_NAME%]: Expected: "%_EXPECTED%"
+    set /a FAIL_COUNT+=1
+    set FAIL_LIST=%FAIL_LIST% %_NAME%
+)
+goto :eof

@@ -110,6 +110,20 @@ echo PASSED: GUI build complete.
 echo.
 
 REM ------------------------------------------------
+REM Step 6: Post Build Smoke Tests
+REM ------------------------------------------------
+echo [6/6] Running Post Build Smoke Tests...
+call post_build_test.cmd
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo FAILED: Smoke tests failed.
+    echo Fix issues before releasing.
+    exit /b 1
+)
+echo PASSED: All smoke tests passed.
+echo.
+
+REM ------------------------------------------------
 REM Build Summary
 REM ------------------------------------------------
 echo ================================================
