@@ -799,11 +799,13 @@ ruff check src/
 # Step 2 - confirm tests pass
 pytest -v
 
-# Step 3 - confirm venv is active
-venv\Scripts\activate
+# Step 3 - Clean previous builds artifacts
 
-# Step 4 - confirm PyInstaller is installed
-pyinstaller --version
+# Step 4 - Post build smoke tests (54 checks x 6 scenarios)
+
+# Step 5 - Build CLI executable
+
+# Step 6 - Build GUI executable
 ```
 
 ## Logging Best Practices
