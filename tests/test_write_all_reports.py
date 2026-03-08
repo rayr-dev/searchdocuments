@@ -222,3 +222,44 @@ def test_summary_failure_reports_status(tmp_path):
                          status_callback=status_mock)
     calls = [c[0][0] for c in status_mock.call_args_list]
     assert any("Error writing Summary" in c for c in calls)
+
+# -----------------------------
+# source_unique / target_unique tests
+# -----------------------------
+def test_build_summary_receives_source_unique(tmp_path):
+    """source_unique should be passed through to build_summary."""
+    with patch(PATCH_EXCEL,   return_value=None), \
+         patch(PATCH_CSV,     return_value=None), \
+         patch(PATCH_TEXT,    return_value=None), \
+         patch(PATCH_SUMMARY, return_value=None) as mock_summary:
+        write_all_reports(str(tmp_path), [], [], [],
+                          source_unique=5)
+    _, kwargs = mock_summary.call_args
+    assert kwargs["source_unique"] == 5
+
+
+def test_build_summary_receives_target_unique(tmp_path):
+    """target_unique should be passed through to build_summary."""
+    with patch(PATCH_EXCEL,   return_value=None), \
+         patch(PATCH_CSV,     return_value=None), \
+         patch(PATCH_TEXT,    return_value=None), \
+         patch(PATCH_SUMMARY, return_value=None) as mock_summary:
+        write_all_reports(str(tmp_path), [], [], [],
+                          target_unique=7)
+    _, kwargs = mock_summary.call_args
+    assert kwargs["target_unique"] == 7
+
+
+def test_build_summary_receives_source_and_target_counts(tmp_path):
+    """source_count and target_count should be passed through to build_summary."""
+    with patch(PATCH_EXCEL,   return_value=None), \
+         patch(PATCH_CSV,     return_value=None), \
+         patch(PATCH_TEXT,    return_value=None), \
+         patch(PATCH_SUMMARY, return_value=None) as mock_summary:
+        write_all_reports(str(tmp_path), [], [], [],
+                          source_count=10,
+                          target_count=12)
+    _, kwargs = mock_summary.call_args
+    assert kwargs["source_count"] == 10
+    assert kwargs["target_count"] == 12
+
