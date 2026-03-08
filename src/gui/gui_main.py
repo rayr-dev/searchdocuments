@@ -104,10 +104,9 @@ def launch_gui(root, info):
     compare_mode_var = tk.StringVar(value="timestamp")
 
     find_all_var = tk.BooleanVar(value=True)  # default
-    dryrun_var = tk.BooleanVar(value=True)    # default
-    deletematches_var = tk.BooleanVar()
-    deletecandidates_var = tk.BooleanVar()
-    quarantine_var = tk.BooleanVar(value=True) # default
+
+    cleanup_mode_var = tk.StringVar(value="dryrun")
+
     diagnostics_var = tk.BooleanVar(value=False) # Diagnostics
 
     # -----------------------------
@@ -250,25 +249,27 @@ def launch_gui(root, info):
                    10,
                    "bold")).pack(anchor="w", padx=20)
 
-    tk.Checkbutton(root, text="Dry Run (No Changes Made)",
-                   bg=LABEL_BG_COLOR,
-                   variable=dryrun_var).pack(anchor="w",
-                                             padx=40)
+    cleanup_mode_var = tk.StringVar(value="dryrun")  # default
 
-    tk.Checkbutton(root, text="Delete Exact Matches",
+    tk.Radiobutton(root, text="Dry Run (No Changes Made)",
                    bg=LABEL_BG_COLOR,
-                   variable=deletematches_var).pack(anchor="w",
-                                                    padx=40)
+                   variable=cleanup_mode_var,
+                   value="dryrun").pack(anchor="w", padx=40)
 
-    tk.Checkbutton(root, text="Delete Mismatch Candidates",
+    tk.Radiobutton(root, text="Delete Exact Matches",
                    bg=LABEL_BG_COLOR,
-                   variable=deletecandidates_var).pack(anchor="w",
-                                                       padx=40)
+                   variable=cleanup_mode_var,
+                   value="deletematches").pack(anchor="w", padx=40)
 
-    tk.Checkbutton(root, text="Use Quarantine Folder",
+    tk.Radiobutton(root, text="Delete Mismatch Candidates",
                    bg=LABEL_BG_COLOR,
-                   variable=quarantine_var).pack(anchor="w",
-                                                 padx=40)
+                   variable=cleanup_mode_var,
+                   value="deletecandidates").pack(anchor="w", padx=40)
+
+    tk.Radiobutton(root, text="Use Quarantine Folder",
+                   bg=LABEL_BG_COLOR,
+                   variable=cleanup_mode_var,
+                   value="quarantine").pack(anchor="w", padx=40)
 
     ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
@@ -359,10 +360,13 @@ def launch_gui(root, info):
         config.HASH_COMPARE_MODE = (mode == "hash")
 
         config.FIND_ALL_LOCATIONS_MODE = find_all_var.get()
-        config.DRY_RUN = dryrun_var.get()
-        config.DELETE_EXACT_MATCHES = deletematches_var.get()
-        config.DELETE_CANDIDATES = deletecandidates_var.get()
-        config.USE_QUARANTINE = quarantine_var.get()
+
+        cleanup_mode = cleanup_mode_var.get()
+        config.DRY_RUN = (cleanup_mode == "dryrun")
+        config.DELETE_EXACT_MATCHES = (cleanup_mode == "deletematches") or (cleanup_mode == "quarantine")
+        config.DELETE_CANDIDATES = (cleanup_mode == "deletecandidates") or (cleanup_mode == "quarantine")
+        config.USE_QUARANTINE = (cleanup_mode == "quarantine")
+
         config.DIAGNOSTIC_MODE = diagnostics_var.get()
 
         # Create timestamped folder FIRST so log goes inside it
@@ -381,10 +385,12 @@ def launch_gui(root, info):
         diag(f"Mode: [{mode}]")
         diag(f"Hash Only Mode: [{config.HASH_ONLY_MODE}]")
         diag(f"Hash Compare Mode: [{config.HASH_COMPARE_MODE}]")
+        diag(f"Cleanup Mode: [{cleanup_mode}]")
         diag(f"Dry Run: [{config.DRY_RUN}]")
         diag(f"Delete Exact Matches: [{config.DELETE_EXACT_MATCHES}]")
         diag(f"Delete Candidates: [{config.DELETE_CANDIDATES}]")
         diag(f"Quarantine: [{config.USE_QUARANTINE}]")
+
         diag(f"Find All Files: [{config.FIND_ALL_LOCATIONS_MODE}]")
 
         config.TIMESTAMPED_OUTPUT = False  # ← folder already created

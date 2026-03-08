@@ -16,6 +16,22 @@ identify and resolve file organization gaps.
 - TARGET: Destination being normalized, gold standard 
           for folder structure
 
+### Folder Options
+
+### Comparision Options
+
+### Find All Files Option
+
+### Runtime Options
+| Cleanup Comptions | Action                                                       |
+| ----------------- | -------------------------------------------------------------| 
+| Dryrun            | No deletions, no quarantine                                  |
+| Delete Marches    | Delete Exact Matches Only (Permanent Deletions)              |
+| Delete Candidates | Delete mismatch candidates only (Permanent Deletions)        |
+| Quarantine        | Move BOTH exact matches AND candidates to quarantine folders |
+
+### Output Detail Level
+
 ### Result Actions
 
 | Result      | Meaning                                  | Immediate Action                           | Follow-up Action                           |

@@ -154,11 +154,13 @@ def run_cli():
     diag(f"Output: {args.output}")
     diag(f"HashOnly: {config.HASH_ONLY_MODE}")
     diag(f"HashCompare: {config.HASH_COMPARE_MODE}")
+
+    diag(f"Dry Run: [{config.DRY_RUN}]")
+    diag(f"Delete Exact Matches: [{config.DELETE_EXACT_MATCHES}]")
+    diag(f"Delete Candidates: [{config.DELETE_CANDIDATES}]")
+    diag(f"Quarantine: [{config.USE_QUARANTINE}]")
+
     diag(f"FindAll: {config.FIND_ALL_LOCATIONS_MODE}")
-    diag(f"DryRun: {config.DRY_RUN}")
-    diag(f"DeleteExact: {config.DELETE_EXACT_MATCHES}")
-    diag(f"DeleteCandidates: {config.DELETE_CANDIDATES}")
-    diag(f"UseQuarantine: {config.USE_QUARANTINE}")
 
     try:
         results, summary_text = run_reconciliation(
