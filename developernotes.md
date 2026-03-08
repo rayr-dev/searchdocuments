@@ -16,21 +16,58 @@ identify and resolve file organization gaps.
 - TARGET: Destination being normalized, gold standard 
           for folder structure
 
+### Two-Phase Reconcilation Process
+* Phase 1 — Scan: scan_folder() walks both trees, builds dict keyed by filename
+* Phase 2 — Compare: compare_engine iterates source files, looks up candidates in target by filename, applies comparison mode logic
+
+### Comparision Modes
+* Fast Mode (default): timestamp + size match → exact match
+* Hash Mode (--hash): timestamp + size match confirmed by MD5 hash
+* Hash Only Mode (--hashonly): skip timestamp entirely, compare by hash only
+
 ### Folder Options
+* REPORTS.  Location where output files are created.
+* SOURCE.  Folder to use as source of comparison.
+* TARGET.  Folder to compare source documents against.
+
+### Output Folders
+output_dir
+  YYYYMMDD_HHMMSS
+    comparison.xlsx
+    comparison.csv
+    comparison.txt
+    summary.txt
+    diagnostics_dump.json
+    reconciliation_YYYYMMDD_HHMMSS.log   ← log always inside timestamped folder
+YYYYMMDD_HHMMSS
+
 
 ### Comparision Options
+There are three options to compare files with the same name.
+* TIMESTAMP.  This is the fastest option, but the lowest accuracy.  
+* HASH COMPARE MODE.  Confirm timestamp matches with hash.
+* HASH MODE ONLY.  Skips timestamp comparison, compare exclusively using file hash.
+
+#### COMPARISON SUMMARY
+| MODE              | ACCURACY | SPEED     |
+|-------------------| ---------|-----------|
+| TIMESTAMP         | LEAST    | FASTEST   |
+| HASH COMPARE ONLY | MODERATE | MODERATE  |
+| HASH MODE ONLY    | MOST     | SLOWEST   |
 
 ### Find All Files Option
+* This options will looks for all locations where a source file exists in the target folder.  
+This option is useful to check for duplication files in the TARGET.  
 
-### Runtime Options
-| Cleanup Comptions | Action                                                       |
-| ----------------- | -------------------------------------------------------------| 
-| Dryrun            | No deletions, no quarantine                                  |
-| Delete Marches    | Delete Exact Matches Only (Permanent Deletions)              |
-| Delete Candidates | Delete mismatch candidates only (Permanent Deletions)        |
-| Quarantine        | Move BOTH exact matches AND candidates to quarantine folders |
+### Cleanup Options
+Action options are used to determine how to handle files that match the Comparison criteria.
 
-### Output Detail Level
+| MODE                  | ACTION                    | DESCRPTION                                                                    |
+|-----------------------|---------------------------|-------------------------------------------------------------------------------|
+| DRY RUN               | No files deletions        | No deletions, no quarantine                                                   |
+| USE QUARANTINE        | Move deletion candidates  | If DRYRUN is OFF, Delete mismatch candidates only (Permanent Deletions)       |
+| DELETE EXACT MATCHES  | Delete Matches            | If DRYRUN IS OFF, Delete exact matches only (Permanent Deletions)             |  
+ | DELETE CANDIDATES    | Delete Mismatched         | If DRYRUN is OFF, Move BOTH exact matches AND candidates to quarantine folder |                    
 
 ### Result Actions
 
@@ -99,57 +136,44 @@ AI classification for Missing files:
 
 ## Project Structure
 ```
-searchdocuments/
-├── src/
-│   ├── cli/
-│   │   └── cli_main.py          # Command line interface
-│   ├── engine/
-│   │   └── compare_engine.py    # Core comparison logic
-│   ├── gui/
-│   │   └── gui_main.py          # Tkinter GUI interface
-│   ├── utilities/
-│   │   ├── logging_setup.py     # Logging initialization
-│   │   ├── output.py            # Output directory creation
-│   │   ├── path_utils.py        # Path helpers, version info
-│   │   ├── safe_delete.py       # Safe delete and quarantine
-│   │   └── scan_folder.py       # Folder scanning
-│   ├── writers/
-│   │   ├── csv_writer.py        # CSV report writer
-│   │   ├── excel_writer.py      # Excel report writer
-│   │   ├── summary_writer.py    # Summary report writer
-│   │   ├── text_writer.py       # Text report writer
-│   │   └── write_all_reports.py # Unified report wrapper
-│   ├── config.py                # Global configuration flags
-│   ├── orchestrator.py          # Run reconciliation entry point
-│   └── version_info.txt         # Application version info (JSON)
-├── tests/
-│   ├── test_cli_main.py
-│   ├── test_compare_engine.py
-│   ├── test_config.py
-│   ├── test_csv_writer.py
-│   ├── test_excel_writer.py
-│   ├── test_logging_setup.py
-│   ├── test_orchestrator.py
-│   ├── test_path_utils.py
-│   ├── test_safe_delete.py
-│   ├── test_scan_folder.py
-│   ├── test_summary_writer.py
-│   ├── test_text_writer.py
-│   └── test_write_all_reports.py
-├── assets/
-│   ├── Search-documents.ico     # Application icon
-│   └── Search-documents.png     # Splash screen image
-├── testdata/
-│   ├── source/                  # Test source folder
-│   ├── target/                  # Test target folder
-│   └── reports/                 # Test output folder
-├── .gitignore
+<pre>
+src/
+  cli/cli_main.py          - CLI entry point, argparse, --version flag
+  gui/gui_main.py          - Tkinter GUI entry point
+  engine/compare_engine.py - Core reconciliation logic
+  orchestrator.py          - Coordinates engine + writers
+  config.py                - Runtime flags (singleton pattern)
+  utilities/
+    logging_setup.py       - init_logging, diag
+    output.py              - create_timestamped_folder
+    path_utils.py          - get_version, get_version_info, resource_path
+    safe_delete.py         - safe_delete, move_to_quarantine, handle_delete
+    scan_folder.py         - scan_folder, dump_scan_results
+  writers/
+    excel_writer.py
+    csv_writer.py
+    text_writer.py
+    summary_writer.py
+    write_all_reports.py   - Unified wrapper, error isolation per writer
+  assets/
+    Search-documents.ico     # Application icon
+│   Search-documents.png     # Splash screen image
+tools/
+  create_testdata.py       - Generates all 6 smoke test scenarios
+testdata/
+  scenario1_same/          - Identical files, mixed types
+  scenario2_mixed/         - Mixed results
+  scenario3_empty_source/  - Empty source folder
+  scenario4_empty_target/  - Empty target folder
+  scenario5_deep_nested/   - 7 levels deep
+  scenario6_special_chars/ - Special filenames, mixed types
 ├── build.cmd                    # Windows build script
 ├── conftest.py                  # pytest configuration
 ├── DEVELOPER_NOTES.md           # This file
 ├── pyproject.toml               # Package configuration
 ├── pytest.ini                   # pytest settings
 └── README.md                    # User documentation
+</pre>
 ```
 ## Smoke Test Data Expected Results
 | Scenario        | Src Files | Tgt Files | Matches | Mismatches | Missing | Multi | Mixed |
@@ -347,7 +371,7 @@ pytest -v --cov=src --cov-report=term-missing
 | `write_all_reports.py` | 100%           |
 | `cli_main.py`          | 100%           |
 | `gui_main.py`          | 0% (by design) |
-| **Total**              | **77%**        |
+| **Total**              | **78%**        |
 
 ---
 Current Coverage Status
@@ -513,46 +537,21 @@ in the full suite due to test ordering.
 - Test what the user or caller experiences
 - Avoid brittle dependencies on internal message wording
 
-
-
-## Test Data
-## Test Data Structure
-Use CMD>tree to generate Markdown graphic
-
-### Same Data
-### Folder Structure
-### Expected Summary Report
-
-### Different Data
-### Folder Structure
-### Expected Summary Report
-
-### No files in targer
-### Folder Structure
-### Expected Summary Report
-
-
 ---
-
-## Build Process
 
 ### Prerequisites
 - PyInstaller installed in venv
 - All tests passing
 - Ruff check clean
 
-### Run Build
-```bash
-build.cmd
-```
-
 ### Build Steps (automated in build.cmd)
-1. Activate venv
-2. Run ruff check — stops if errors found
-3. Run pytest — stops if tests fail
-4. Clean dist/ and build/ folders
-5. Build CLI executable
-6. Build GUI executable
+1. 'Activate venv'
+2. 'Run ruff check src/ tests/' — stops if errors found
+3. 'Run pytest -v' — stops if tests fail
+4. 'Clean dist/ and build/ folders'
+5. 'Post build some tests (54 checks x 6 scenarios'
+6. 'Build CLI executable'
+7. 'Build GUI executable'
 
 ### Build Output
 ```
@@ -739,9 +738,6 @@ git commit -m "Release v1.0.0"
 ## Known Issues and Limitations
 
 ### Open Issues
-1. About box version display — under investigation
-2. GUI summary output differs from summary.txt — under investigation
-3. Files in TARGET but not in SOURCE — use case review needed
 
 ### Design Decisions
 - `gui_main.py` excluded from unit test coverage by design
@@ -749,6 +745,7 @@ git commit -m "Release v1.0.0"
 - SOURCE is assumed to be equal to or a subset of TARGET
 
 ### Future Enhancements
+- Target-only files silently ignored (no target only report category)
 - GitHub repository setup
 - File placement automation with AI classification
 - Action plan report generation with execute mode
@@ -811,14 +808,17 @@ pytest -v
 ## Logging Best Practices
 ---
 ### Logging Conventions
-| Method                | When to Use                                   |
-|-----------------------|-----------------------------------------------|
-| `logging.info()`      | Normal operational messages                   |
-| `logging.warning()`   | Unexpected but recoverable situations         |
-| `logging.error()`     | Something failed but app continues            |
-| `logging.exception()` | Errors with full stack trace                  |
-| `diag()`              | Detailed debug info when DIAGNOSTIC_MODE=True |
-| `print()`             | User facing CLI output only                   |
+| Method                | When to Use                                                      |
+|-----------------------|------------------------------------------------------------------|
+| `logging.info()`      | Normal operational messages                                      |
+| `logging.warning()`   | Unexpected but recoverable situations                            |
+| `logging.error()`     | Errors and exceptions                                            |
+| `logging.exception()` | Errors with full stack trace                                     |
+| `logging.debug()`     | detailed trace, diag mode only                                   |
+| `diag()`              | Detailed debug info when DIAGNOSTIC_MODE=True                    |
+| `print()`             | User facing CLI output only                                      |
+| `Log fie`             | always created inside timestamped output folder                  | 
+| `GUI Logging`         | Loggings starts only when Run is clicked and output folder known |
 
 ### Files Audit Logging Summary
 | File              | Logging              | diag                                 | print        |
