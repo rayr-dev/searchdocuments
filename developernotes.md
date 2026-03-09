@@ -62,12 +62,12 @@ This option is useful to check for duplication files in the TARGET.
 ### Cleanup Options
 Action options are used to determine how to handle files that match the Comparison criteria.
 
-| MODE                  | ACTION                    | DESCRPTION                                                                    |
-|-----------------------|---------------------------|-------------------------------------------------------------------------------|
-| DRY RUN               | No files deletions        | No deletions, no quarantine                                                   |
-| USE QUARANTINE        | Move deletion candidates  | If DRYRUN is OFF, Delete mismatch candidates only (Permanent Deletions)       |
-| DELETE EXACT MATCHES  | Delete Matches            | If DRYRUN IS OFF, Delete exact matches only (Permanent Deletions)             |  
- | DELETE CANDIDATES    | Delete Mismatched         | If DRYRUN is OFF, Move BOTH exact matches AND candidates to quarantine folder |                    
+| MODE                   | ACTION                    | DESCRPTION                                                                    |
+|------------------------|---------------------------|-------------------------------------------------------------------------------|
+| DRY RUN                | No files deletions        | No deletions, no quarantine                                                   |
+| USE QUARANTINE         | Move deletion candidates  | If DRYRUN is OFF, Delete mismatch candidates only (Permanent Deletions)       |
+| DELETE EXACT MATCHES   | Delete Matches            | If DRYRUN IS OFF, Delete exact matches only (Permanent Deletions)             |  
+| DELETE CANDIDATES      | Delete Mismatched         | If DRYRUN is OFF, Move BOTH exact matches AND candidates to quarantine folder |                    
 
 ### Result Actions
 

@@ -245,31 +245,50 @@ def launch_gui(root, info):
     tk.Label(root,
              text="Cleanup Options:",
              bg=LABEL_BG_COLOR,
-             font=("Segoe UI",
-                   10,
-                   "bold")).pack(anchor="w", padx=20)
+             font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=20)
 
-    cleanup_mode_var = tk.StringVar(value="dryrun")  # default
+    rb_dryrun = tk.Radiobutton(root, text="Dry Run (No Changes Made)",
+                               bg=LABEL_BG_COLOR,
+                               variable=cleanup_mode_var,
+                               value="dryrun",
+                               command=lambda: on_cleanup_mode_changed())
+    rb_dryrun.pack(anchor="w", padx=40)
 
-    tk.Radiobutton(root, text="Dry Run (No Changes Made)",
-                   bg=LABEL_BG_COLOR,
-                   variable=cleanup_mode_var,
-                   value="dryrun").pack(anchor="w", padx=40)
+    rb_deletematches = tk.Radiobutton(root, text="Delete Exact Matches Only",
+                                      bg=LABEL_BG_COLOR,
+                                      variable=cleanup_mode_var,
+                                      value="deletematches",
+                                      command=lambda: on_cleanup_mode_changed())
+    rb_deletematches.pack(anchor="w", padx=40)
 
-    tk.Radiobutton(root, text="Delete Exact Matches",
-                   bg=LABEL_BG_COLOR,
-                   variable=cleanup_mode_var,
-                   value="deletematches").pack(anchor="w", padx=40)
+    rb_deletecandidates = tk.Radiobutton(root, text="Delete Mismatch Candidates Only",
+                                         bg=LABEL_BG_COLOR,
+                                         variable=cleanup_mode_var,
+                                         value="deletecandidates",
+                                         command=lambda: on_cleanup_mode_changed())
+    rb_deletecandidates.pack(anchor="w", padx=40)
 
-    tk.Radiobutton(root, text="Delete Mismatch Candidates",
-                   bg=LABEL_BG_COLOR,
-                   variable=cleanup_mode_var,
-                   value="deletecandidates").pack(anchor="w", padx=40)
+    rb_deleteboth = tk.Radiobutton(root, text="Delete Matches and Candidates",
+                                   bg=LABEL_BG_COLOR,
+                                   variable=cleanup_mode_var,
+                                   value="deleteboth",
+                                   command=lambda: on_cleanup_mode_changed())
+    rb_deleteboth.pack(anchor="w", padx=40)
 
-    tk.Radiobutton(root, text="Use Quarantine Folder",
-                   bg=LABEL_BG_COLOR,
-                   variable=cleanup_mode_var,
-                   value="quarantine").pack(anchor="w", padx=40)
+    # Delivery method — independent checkbox
+    quarantine_var = tk.BooleanVar(value=False)
+    cb_quarantine = tk.Checkbutton(root, text="Use Quarantine Folder",
+                                   bg=LABEL_BG_COLOR,
+                                   variable=quarantine_var,
+                                   state="disabled")  # disabled by default (dryrun)
+    cb_quarantine.pack(anchor="w", padx=60)
+
+    def on_cleanup_mode_changed():
+        if cleanup_mode_var.get() == "dryrun":
+            cb_quarantine.config(state="disabled")
+            quarantine_var.set(False)
+        else:
+            cb_quarantine.config(state="normal")
 
     ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
@@ -363,9 +382,9 @@ def launch_gui(root, info):
 
         cleanup_mode = cleanup_mode_var.get()
         config.DRY_RUN = (cleanup_mode == "dryrun")
-        config.DELETE_EXACT_MATCHES = (cleanup_mode == "deletematches") or (cleanup_mode == "quarantine")
-        config.DELETE_CANDIDATES = (cleanup_mode == "deletecandidates") or (cleanup_mode == "quarantine")
-        config.USE_QUARANTINE = (cleanup_mode == "quarantine")
+        config.DELETE_EXACT_MATCHES = cleanup_mode in ("deletematches", "deleteboth")
+        config.DELETE_CANDIDATES = cleanup_mode in ("deletecandidates", "deleteboth")
+        config.USE_QUARANTINE = quarantine_var.get()
 
         config.DIAGNOSTIC_MODE = diagnostics_var.get()
 
@@ -374,7 +393,6 @@ def launch_gui(root, info):
         timestamped_dir = create_timestamped_folder(output_dir)
 
         log_path = init_logging(timestamped_dir, diagnostic=config.DIAGNOSTIC_MODE)
-        logging.info(f"GUI Log file created: {log_path}")
 
         logging.info(f"GUI started - Log file created: {log_path}")  # ← move here
 

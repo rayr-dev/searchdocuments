@@ -16,6 +16,7 @@ import logging
 
 #local
 from utilities.logging_setup import dump_diagnostics
+from utilities.safe_delete import handle_delete
 from utilities.scan_folder import dump_scan_results
 from utilities.path_utils import file_hash
 from utilities.logging_setup import diag
@@ -146,21 +147,31 @@ def compare_folders_recursive(folderA,
             mismatch_list.append((pathB, sizeB, mtimeB))
 
         # FINAL DECISION
+        quarantine_dir = os.path.join(output_dir, "quarantine")
+
         if found_match:
             diag("FOUND MATCH IF Processing")
-            # We DO NOT suppress mismatches anymore.
-            # Mixed cases should show both matches and mismatches.
+            if config.DELETE_EXACT_MATCHES and not config.DRY_RUN:
+                diag(f"DELETING EXACT MATCH: {pathA}")
+                handle_delete(pathA, quarantine_dir=quarantine_dir)
+            elif config.DRY_RUN:
+                diag(f"[DRY RUN] Would delete exact match: {pathA}")
             if mismatch_list:
                 diag(f"FOUND MISMATCH: {rel}")
                 mismatched.append((rel, pathA, mismatch_list))
+
         else:
-            # No matches at all
             if mismatch_list:
                 diag(f"NO MATCH FOUND - MISMATCHED: {rel}")
                 mismatched.append((rel, pathA, mismatch_list))
+                if config.DELETE_CANDIDATES and not config.DRY_RUN:
+                    diag(f"DELETING MISMATCH CANDIDATE: {pathA}")
+                    handle_delete(pathA, quarantine_dir=quarantine_dir)
+                elif config.DRY_RUN:
+                    diag(f"[DRY RUN] Would delete mismatch candidate: {pathA}")
             else:
-                diag(f"NO MATCH and NO MISMATCH: {rel}") # pragma: no cover
-                missing.append((rel, pathA)) # pragma: no cover
+                diag(f"NO MATCH and NO MISMATCH: {rel}")  # pragma: no cover
+                missing.append((rel, pathA))  # pragma: no cover
 
     if progress_callback:
         progress_callback(50)
