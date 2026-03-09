@@ -32,7 +32,7 @@ def test_csv_file_is_created(tmp_path):
 def test_csv_has_header_row(tmp_path):
     write_csv_output(str(tmp_path), [], [], [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
-    assert rows[0] == ["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B"]
+    assert rows[0] == ["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B", "Action"]
 
 def test_csv_empty_data_only_header(tmp_path):
     write_csv_output(str(tmp_path), [], [], [])
@@ -44,7 +44,7 @@ def test_csv_empty_data_only_header(tmp_path):
 # -----------------------------
 def test_csv_writes_exact_match(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches = [("file.txt", fileA, fileB)]
+    matches = [("file.txt", fileA, fileB, None)]
     write_csv_output(output_dir, matches, [], [])
     rows = read_csv(os.path.join(output_dir, "comparison.csv"))
     assert len(rows) == 2  # header + 1 match
@@ -54,8 +54,8 @@ def test_csv_writes_exact_match(sample_files):
 def test_csv_writes_multiple_matches(sample_files):
     fileA, fileB, output_dir = sample_files
     matches = [
-        ("file1.txt", fileA, fileB),
-        ("file2.txt", fileA, fileB),
+        ("file1.txt", fileA, fileB, None),
+        ("file2.txt", fileA, fileB, None),
     ]
     write_csv_output(output_dir, matches, [], [])
     rows = read_csv(os.path.join(output_dir, "comparison.csv"))
@@ -64,7 +64,7 @@ def test_csv_writes_multiple_matches(sample_files):
 def test_csv_skips_match_with_invalid_pathA(tmp_path):
     fileB = tmp_path / "fileB.txt"
     fileB.write_text("content")
-    matches = [("file.txt", "fake/path/file.txt", str(fileB))]
+    matches = [("file.txt", "fake/path/file.txt", str(fileB), None)]
     write_csv_output(str(tmp_path), matches, [], [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
     assert len(rows) == 1  # only header, match skipped
@@ -72,7 +72,7 @@ def test_csv_skips_match_with_invalid_pathA(tmp_path):
 def test_csv_skips_match_with_invalid_pathB(tmp_path):
     fileA = tmp_path / "fileA.txt"
     fileA.write_text("content")
-    matches = [("file.txt", str(fileA), "fake/path/file.txt")]
+    matches = [("file.txt", str(fileA), "fake/path/file.txt", None)]
     write_csv_output(str(tmp_path), matches, [], [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
     assert len(rows) == 1  # only header, match skipped
@@ -82,7 +82,7 @@ def test_csv_skips_match_with_invalid_pathB(tmp_path):
 # -----------------------------
 def test_csv_writes_mismatch(sample_files):
     fileA, fileB, output_dir = sample_files
-    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)])]
+    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)], None)]
     write_csv_output(output_dir, [], mismatched, [])
     rows = read_csv(os.path.join(output_dir, "comparison.csv"))
     assert len(rows) == 2  # header + 1 mismatch
@@ -93,7 +93,7 @@ def test_csv_writes_multiple_mismatch_candidates(sample_files):
     mismatched = [("file.txt", fileA, [
         (fileB, 100, 1234567890.0),
         (fileB, 200, 1234567891.0),
-    ])]
+    ], None)]
     write_csv_output(output_dir, [], mismatched, [])
     rows = read_csv(os.path.join(output_dir, "comparison.csv"))
     assert len(rows) == 3  # header + 2 mismatch rows
@@ -101,7 +101,7 @@ def test_csv_writes_multiple_mismatch_candidates(sample_files):
 def test_csv_skips_mismatch_with_invalid_pathA(tmp_path):
     fileB = tmp_path / "fileB.txt"
     fileB.write_text("content")
-    mismatched = [("file.txt", "fake/path.txt", [(str(fileB), 100, 0)])]
+    mismatched = [("file.txt", "fake/path.txt", [(str(fileB), 100, 0)], None)]
     write_csv_output(str(tmp_path), [], mismatched, [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
     assert len(rows) == 1  # only header
@@ -109,7 +109,7 @@ def test_csv_skips_mismatch_with_invalid_pathA(tmp_path):
 def test_csv_skips_mismatch_with_invalid_pathB(tmp_path):
     fileA = tmp_path / "fileA.txt"
     fileA.write_text("content")
-    mismatched = [("file.txt", str(fileA), [("fake/pathB.txt", 100, 0)])]
+    mismatched = [("file.txt", str(fileA), [("fake/pathB.txt", 100, 0)], None)]
     write_csv_output(str(tmp_path), [], mismatched, [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
     assert len(rows) == 1  # only header
@@ -159,8 +159,8 @@ def test_csv_progress_callback_called(tmp_path):
 # -----------------------------
 def test_csv_writes_all_types(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches   = [("match.txt", fileA, fileB)]
-    mismatched = [("mismatch.txt", fileA, [(fileB, 100, 0)])]
+    matches   = [("match.txt", fileA, fileB, None)]
+    mismatched = [("mismatch.txt", fileA, [(fileB, 100, 0)], None)]
     missing   = [("missing.txt", fileA)]
     write_csv_output(output_dir, matches, mismatched, missing)
     rows = read_csv(os.path.join(output_dir, "comparison.csv"))
@@ -186,7 +186,7 @@ def test_csv_match_handles_timestamp_error(tmp_path, monkeypatch):
 
     monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
 
-    matches = [("file.txt", str(fileA), str(fileB))]
+    matches = [("file.txt", str(fileA), str(fileB), None)]
     write_csv_output(str(tmp_path), matches, [], [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
 
@@ -207,7 +207,7 @@ def test_csv_mismatch_handles_timestamp_error(tmp_path, monkeypatch):
 
     monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
 
-    mismatched = [("file.txt", str(fileA), [(str(fileB), 100, 0)])]
+    mismatched = [("file.txt", str(fileA), [(str(fileB), 100, 0)], None)]
     write_csv_output(str(tmp_path), [], mismatched, [])
     rows = read_csv(str(tmp_path / "comparison.csv"))
 

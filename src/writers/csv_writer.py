@@ -29,12 +29,12 @@ def write_csv_output(output_dir,
     try:
         with open(csv_path, "w", newline="", encoding="utf-8", errors="replace") as f:
             writer = csv.writer(f)
-            writer.writerow(["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B"])
+            writer.writerow(["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B", "Action"])
 
             # ------------------------------------------------------------
             # Exact Matches
             # ------------------------------------------------------------
-            for name, pathA, pathB in matches:
+            for name, pathA, pathB, action in matches:
 
                 if not pathA or not os.path.exists(pathA):
                     diag(f"CSV: Skipping invalid pathA for match: {pathA}")
@@ -52,12 +52,12 @@ def write_csv_output(output_dir,
                 except Exception:
                     tsB = ""
 
-                writer.writerow(["Exact Match", name, pathA, tsA, pathB, tsB])
+                writer.writerow(["Exact Match", name, pathA, tsA, pathB, tsB, action or ""])
 
             # ------------------------------------------------------------
             # Mismatches
             # ------------------------------------------------------------
-            for name, pathA, b_list in mismatched:
+            for name, pathA, b_list, action in mismatched:
 
                 if not pathA or not os.path.exists(pathA):
                     diag(f"CSV: Skipping invalid pathA for mismatch: {pathA}")
@@ -79,7 +79,7 @@ def write_csv_output(output_dir,
                     except Exception:
                         tsB = ""
 
-                    writer.writerow(["Mismatch", name, pathA, tsA, pathB, tsB])
+                    writer.writerow(["Mismatch", name, pathA, tsA, pathB, tsB, action or ""])
 
             # ------------------------------------------------------------
             # Missing Files
