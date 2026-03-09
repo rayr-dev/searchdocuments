@@ -47,7 +47,7 @@ def test_txt_empty_data_has_only_headers(tmp_path):
 # -----------------------------
 def test_txt_writes_exact_match(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches = [("file.txt", fileA, fileB)]
+    matches = [("file.txt", fileA, fileB, None)]
     write_text_output(output_dir, matches, [], [])
     content = read_txt(os.path.join(output_dir, "comparison.txt"))
     assert "file.txt" in content
@@ -57,8 +57,8 @@ def test_txt_writes_exact_match(sample_files):
 def test_txt_writes_multiple_matches(sample_files):
     fileA, fileB, output_dir = sample_files
     matches = [
-        ("file1.txt", fileA, fileB),
-        ("file2.txt", fileA, fileB),
+        ("file1.txt", fileA, fileB, None),
+        ("file2.txt", fileA, fileB, None),
     ]
     write_text_output(output_dir, matches, [], [])
     content = read_txt(os.path.join(output_dir, "comparison.txt"))
@@ -68,7 +68,7 @@ def test_txt_writes_multiple_matches(sample_files):
 def test_txt_skips_match_with_invalid_pathA(tmp_path):
     fileB = tmp_path / "fileB.txt"
     fileB.write_text("content")
-    matches = [("file.txt", "fake/path.txt", str(fileB))]
+    matches = [("file.txt", "fake/path.txt", str(fileB), None)]
     write_text_output(str(tmp_path), matches, [], [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     assert "file.txt" not in content
@@ -76,7 +76,7 @@ def test_txt_skips_match_with_invalid_pathA(tmp_path):
 def test_txt_skips_match_with_invalid_pathB(tmp_path):
     fileA = tmp_path / "fileA.txt"
     fileA.write_text("content")
-    matches = [("file.txt", str(fileA), "fake/pathB.txt")]
+    matches = [("file.txt", str(fileA), "fake/pathB.txt", None)]
     write_text_output(str(tmp_path), matches, [], [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     assert "file.txt" not in content
@@ -86,7 +86,7 @@ def test_txt_skips_match_with_invalid_pathB(tmp_path):
 # -----------------------------
 def test_txt_writes_mismatch(sample_files):
     fileA, fileB, output_dir = sample_files
-    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)])]
+    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)], None)]
     write_text_output(output_dir, [], mismatched, [])
     content = read_txt(os.path.join(output_dir, "comparison.txt"))
     assert "file.txt" in content
@@ -97,7 +97,7 @@ def test_txt_writes_multiple_mismatch_candidates(sample_files):
     mismatched = [("file.txt", fileA, [
         (fileB, 100, 1234567890.0),
         (fileB, 200, 1234567891.0),
-    ])]
+    ], None)]
     write_text_output(output_dir, [], mismatched, [])
     content = read_txt(os.path.join(output_dir, "comparison.txt"))
     assert content.count("B:") >= 2
@@ -105,7 +105,7 @@ def test_txt_writes_multiple_mismatch_candidates(sample_files):
 def test_txt_skips_mismatch_with_invalid_pathA(tmp_path):
     fileB = tmp_path / "fileB.txt"
     fileB.write_text("content")
-    mismatched = [("file.txt", "fake/path.txt", [(str(fileB), 100, 0)])]
+    mismatched = [("file.txt", "fake/path.txt", [(str(fileB), 100, 0)], None)]
     write_text_output(str(tmp_path), [], mismatched, [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     assert "file.txt" not in content
@@ -113,7 +113,7 @@ def test_txt_skips_mismatch_with_invalid_pathA(tmp_path):
 def test_txt_skips_mismatch_with_invalid_pathB(tmp_path):
     fileA = tmp_path / "fileA.txt"
     fileA.write_text("content")
-    mismatched = [("file.txt", str(fileA), [("fake/pathB.txt", 100, 0)])]
+    mismatched = [("file.txt", str(fileA), [("fake/pathB.txt", 100, 0)], None)]
     write_text_output(str(tmp_path), [], mismatched, [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     assert "fake/pathB.txt" not in content
@@ -129,7 +129,7 @@ def test_txt_mismatch_handles_timestamp_error(tmp_path, monkeypatch):
         raise OSError("Permission denied")
     monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
 
-    mismatched = [("file.txt", str(fileA), [(str(fileB), 100, None)])]
+    mismatched = [("file.txt", str(fileA), [(str(fileB), 100, None)], None)]
     write_text_output(str(tmp_path), [], mismatched, [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     assert "file.txt" in content
@@ -179,11 +179,28 @@ def test_txt_handles_write_error(tmp_path, monkeypatch):
 # -----------------------------
 def test_txt_writes_all_types(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches    = [("match.txt", fileA, fileB)]
-    mismatched = [("mismatch.txt", fileA, [(fileB, 100, 1234567890.0)])]
+    matches    = [("match.txt", fileA, fileB, None)]
+    mismatched = [("mismatch.txt", fileA, [(fileB, 100, 1234567890.0)], None)]
     missing    = [("missing.txt", fileA)]
     write_text_output(output_dir, matches, mismatched, missing)
     content = read_txt(os.path.join(output_dir, "comparison.txt"))
     assert "match.txt" in content
     assert "mismatch.txt" in content
     assert "missing.txt" in content
+
+def test_txt_writes_action_for_match(sample_files):
+    """Action field should appear in output when set on a match."""
+    fileA, fileB, output_dir = sample_files
+    matches = [("file.txt", fileA, fileB, "DELETED")]
+    write_text_output(output_dir, matches, [], [])
+    content = read_txt(os.path.join(output_dir, "comparison.txt"))
+    assert "Action: DELETED" in content
+
+
+def test_txt_writes_action_for_mismatch(sample_files):
+    """Action field should appear in output when set on a mismatch."""
+    fileA, fileB, output_dir = sample_files
+    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)], "QUARANTINED")]
+    write_text_output(output_dir, [], mismatched, [])
+    content = read_txt(os.path.join(output_dir, "comparison.txt"))
+    assert "Action: QUARANTINED" in content

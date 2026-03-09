@@ -31,7 +31,7 @@ def write_text_output(output_dir,
             # ------------------------------------------------------------
             f.write("=== Exact Matches ===\n")
 
-            for name, pathA, pathB in matches:
+            for name, pathA, pathB, action in matches:
 
                 if not pathA or not os.path.exists(pathA):
                     diag(f"Text: Skipping invalid pathA for match: {pathA}")
@@ -42,14 +42,17 @@ def write_text_output(output_dir,
 
                 f.write(f"{name}\n")
                 f.write(f"  A: {pathA}\n")
-                f.write(f"  B: {pathB}\n\n")
+                f.write(f"  B: {pathB}\n")
+                if action:
+                    f.write(f"   Action: {action}\n")
+                f.write("\n")
 
             # ------------------------------------------------------------
             # Mismatches
             # ------------------------------------------------------------
             f.write("=== Mismatches ===\n")
 
-            for name, pathA, b_list in mismatched:
+            for name, pathA, b_list, action in mismatched:
 
                 if not pathA or not os.path.exists(pathA):
                     diag(f"Text: Skipping invalid pathA for mismatch: {pathA}")
@@ -62,6 +65,8 @@ def write_text_output(output_dir,
 
                 f.write(f"{name}\n")
                 f.write(f"  A: {pathA} (ts={tsA})\n")
+                if action:
+                    f.write(f"   Action: {action}\n")
 
                 for pathB, sizeB, mtimeB in b_list:
 
@@ -75,7 +80,6 @@ def write_text_output(output_dir,
                         tsB = ""
 
                     f.write(f"  B: {pathB} (size={sizeB}, ts={tsB})\n")
-
                 f.write("\n")
 
             # ------------------------------------------------------------
