@@ -34,7 +34,7 @@ def test_excel_file_is_created(tmp_path):
 def test_excel_has_header_row(tmp_path):
     write_excel_output(str(tmp_path), [], [], [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
-    assert rows[0] == ["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B"]
+    assert rows[0] == ["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B", "Action"]
 
 def test_excel_empty_data_only_header(tmp_path):
     write_excel_output(str(tmp_path), [], [], [])
@@ -51,7 +51,7 @@ def test_excel_sheet_title(tmp_path):
 # -----------------------------
 def test_excel_writes_exact_match(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches = [("file.txt", fileA, fileB)]
+    matches = [("file.txt", fileA, fileB, None)]
     write_excel_output(output_dir, matches, [], [])
     rows = read_xlsx(os.path.join(output_dir, "comparison.xlsx"))
     assert len(rows) == 2
@@ -61,8 +61,8 @@ def test_excel_writes_exact_match(sample_files):
 def test_excel_writes_multiple_matches(sample_files):
     fileA, fileB, output_dir = sample_files
     matches = [
-        ("file1.txt", fileA, fileB),
-        ("file2.txt", fileA, fileB),
+        ("file1.txt", fileA, fileB, None),
+        ("file2.txt", fileA, fileB, None),
     ]
     write_excel_output(output_dir, matches, [], [])
     rows = read_xlsx(os.path.join(output_dir, "comparison.xlsx"))
@@ -71,7 +71,7 @@ def test_excel_writes_multiple_matches(sample_files):
 def test_excel_skips_match_with_invalid_pathA(tmp_path):
     fileB = tmp_path / "fileB.txt"
     fileB.write_text("content")
-    matches = [("file.txt", "fake/path.txt", str(fileB))]
+    matches = [("file.txt", "fake/path.txt", str(fileB), None)]
     write_excel_output(str(tmp_path), matches, [], [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
     assert len(rows) == 1  # only header
@@ -79,14 +79,14 @@ def test_excel_skips_match_with_invalid_pathA(tmp_path):
 def test_excel_skips_match_with_invalid_pathB(tmp_path):
     fileA = tmp_path / "fileA.txt"
     fileA.write_text("content")
-    matches = [("file.txt", str(fileA), "fake/pathB.txt")]
+    matches = [("file.txt", str(fileA), "fake/pathB.txt", None)]
     write_excel_output(str(tmp_path), matches, [], [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
     assert len(rows) == 1  # only header
 
 def test_excel_match_row_has_green_fill(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches = [("file.txt", fileA, fileB)]
+    matches = [("file.txt", fileA, fileB, None)]
     write_excel_output(output_dir, matches, [], [])
     wb = load_workbook(os.path.join(output_dir, "comparison.xlsx"))
     ws = wb.active
@@ -98,7 +98,7 @@ def test_excel_match_row_has_green_fill(sample_files):
 # -----------------------------
 def test_excel_writes_mismatch(sample_files):
     fileA, fileB, output_dir = sample_files
-    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)])]
+    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)], None)]
     write_excel_output(output_dir, [], mismatched, [])
     rows = read_xlsx(os.path.join(output_dir, "comparison.xlsx"))
     assert len(rows) == 2
@@ -109,7 +109,7 @@ def test_excel_writes_multiple_mismatch_candidates(sample_files):
     mismatched = [("file.txt", fileA, [
         (fileB, 100, 1234567890.0),
         (fileB, 200, 1234567891.0),
-    ])]
+        ],None)]
     write_excel_output(output_dir, [], mismatched, [])
     rows = read_xlsx(os.path.join(output_dir, "comparison.xlsx"))
     assert len(rows) == 3
@@ -117,7 +117,7 @@ def test_excel_writes_multiple_mismatch_candidates(sample_files):
 def test_excel_skips_mismatch_with_invalid_pathA(tmp_path):
     fileB = tmp_path / "fileB.txt"
     fileB.write_text("content")
-    mismatched = [("file.txt", "fake/path.txt", [(str(fileB), 100, 0)])]
+    mismatched = [("file.txt", "fake/path.txt", [(str(fileB), 100, 0)], None)]
     write_excel_output(str(tmp_path), [], mismatched, [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
     assert len(rows) == 1
@@ -125,14 +125,14 @@ def test_excel_skips_mismatch_with_invalid_pathA(tmp_path):
 def test_excel_skips_mismatch_with_invalid_pathB(tmp_path):
     fileA = tmp_path / "fileA.txt"
     fileA.write_text("content")
-    mismatched = [("file.txt", str(fileA), [("fake/pathB.txt", 100, 0)])]
+    mismatched = [("file.txt", str(fileA), [("fake/pathB.txt", 100, 0)], None)]
     write_excel_output(str(tmp_path), [], mismatched, [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
     assert len(rows) == 1
 
 def test_excel_mismatch_row_has_yellow_fill(sample_files):
     fileA, fileB, output_dir = sample_files
-    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)])]
+    mismatched = [("file.txt", fileA, [(fileB, 100, 1234567890.0)], None)]
     write_excel_output(output_dir, [], mismatched, [])
     wb = load_workbook(os.path.join(output_dir, "comparison.xlsx"))
     ws = wb.active
@@ -186,7 +186,7 @@ def test_excel_match_handles_timestamp_error(tmp_path, monkeypatch):
         raise OSError("Permission denied")
     monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
 
-    matches = [("file.txt", str(fileA), str(fileB))]
+    matches = [("file.txt", str(fileA), str(fileB), None)]
     write_excel_output(str(tmp_path), matches, [], [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
     assert len(rows) == 2
@@ -202,7 +202,7 @@ def test_excel_mismatch_handles_timestamp_error(tmp_path, monkeypatch):
         raise OSError("Permission denied")
     monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
 
-    mismatched = [("file.txt", str(fileA), [(str(fileB), 100, 0)])]
+    mismatched = [("file.txt", str(fileA), [(str(fileB), 100, 0)], None)]
     write_excel_output(str(tmp_path), [], mismatched, [])
     rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
     assert len(rows) == 2
@@ -248,8 +248,8 @@ def test_excel_handles_write_error(tmp_path, monkeypatch):
 # -----------------------------
 def test_excel_writes_all_types(sample_files):
     fileA, fileB, output_dir = sample_files
-    matches    = [("match.txt", fileA, fileB)]
-    mismatched = [("mismatch.txt", fileA, [(fileB, 100, 1234567890.0)])]
+    matches    = [("match.txt", fileA, fileB, None)]
+    mismatched = [("mismatch.txt", fileA,[(fileB,100,1234567890.0)],None)]
     missing    = [("missing.txt", fileA)]
     write_excel_output(output_dir, matches, mismatched, missing)
     rows = read_xlsx(os.path.join(output_dir, "comparison.xlsx"))

@@ -43,6 +43,7 @@ def write_excel_output(output_dir,
             "Timestamp A",
             "Path B",
             "Timestamp B",
+            "Action",
         ]
         ws.append(header)
 
@@ -55,7 +56,7 @@ def write_excel_output(output_dir,
         # ------------------------------------------------------------
         # Exact Matches
         # ------------------------------------------------------------
-        for name, pathA, pathB in matches:
+        for name, pathA, pathB, action in matches:
 
             if not pathA or not os.path.exists(pathA):
                 diag(f"Excel: Skipping invalid pathA for match: {pathA}")
@@ -73,7 +74,7 @@ def write_excel_output(output_dir,
             except Exception:
                 tsB = ""
 
-            row = ["Exact Match", name, pathA, tsA, pathB, tsB]
+            row = ["Exact Match", name, pathA, tsA, pathB, tsB, action or ""]
             ws.append(row)
 
             for cell in ws[ws.max_row]:
@@ -84,7 +85,7 @@ def write_excel_output(output_dir,
         # ------------------------------------------------------------
         diag("Checkpoint Before Mismatches")
 
-        for name, pathA, b_list in mismatched:
+        for name, pathA, b_list, action in mismatched:
 
             if not pathA or not os.path.exists(pathA):
                 diag(f"Excel: Skipping invalid pathA for mismatch: {pathA}")
@@ -106,7 +107,7 @@ def write_excel_output(output_dir,
                 except Exception:
                     tsB = ""
 
-                row = ["Mismatch", name, pathA, tsA, pathB, tsB]
+                row = ["Mismatch", name, pathA, tsA, pathB, tsB, action or ""]
                 ws.append(row)
                 for cell in ws[ws.max_row]:
                     cell.fill = yellow
