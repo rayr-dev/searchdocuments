@@ -803,3 +803,63 @@ def test_dry_run_candidate_does_not_call_handle_delete(folders, monkeypatch):
         results, _ = make_call(folderA, folderB, output)
 
     assert not mock_delete.called
+
+def test_quarantine_exact_match_calls_handle_delete(folders, monkeypatch):
+    """USE_QUARANTINE=True should call handle_delete with quarantine_dir for matched file."""
+    folderA, folderB, output = folders
+    import src.engine.compare_engine as engine_module
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT",    False)
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE",        False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE",     False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
+    monkeypatch.setattr(engine_module.config, "DELETE_EXACT_MATCHES",  True)
+    monkeypatch.setattr(engine_module.config, "DELETE_CANDIDATES",     False)
+    monkeypatch.setattr(engine_module.config, "DRY_RUN",               False)
+    monkeypatch.setattr(engine_module.config, "USE_QUARANTINE",        True)
+
+    open(folderA + "/file.txt", "w").write("same content")
+    open(folderB + "/file.txt", "w").write("same content")
+    import os
+    os.utime(folderA + "/file.txt", (1000, 1000))
+    os.utime(folderB + "/file.txt", (1000, 1000))
+
+    with patch(PATCH_WRITE,   return_value=None), \
+         patch(PATCH_SUMMARY, return_value=""), \
+         patch(PATCH_DUMP,    return_value=None), \
+         patch(PATCH_SCANRES, return_value=None), \
+         patch("src.engine.compare_engine.handle_delete") as mock_delete:
+        results, _ = make_call(folderA, folderB, output)
+
+    assert mock_delete.called
+    _, kwargs = mock_delete.call_args
+    assert "quarantine" in kwargs["quarantine_dir"]
+
+def test_quarantine_candidate_calls_handle_delete(folders, monkeypatch):
+    """USE_QUARANTINE=True should call handle_delete with quarantine_dir for mismatched file."""
+    folderA, folderB, output = folders
+    import src.engine.compare_engine as engine_module
+    monkeypatch.setattr(engine_module.config, "TIMESTAMPED_OUTPUT",    False)
+    monkeypatch.setattr(engine_module.config, "HASH_ONLY_MODE",        False)
+    monkeypatch.setattr(engine_module.config, "HASH_COMPARE_MODE",     False)
+    monkeypatch.setattr(engine_module.config, "FIND_ALL_LOCATIONS_MODE", True)
+    monkeypatch.setattr(engine_module.config, "DELETE_EXACT_MATCHES",  False)
+    monkeypatch.setattr(engine_module.config, "DELETE_CANDIDATES",     True)
+    monkeypatch.setattr(engine_module.config, "DRY_RUN",               False)
+    monkeypatch.setattr(engine_module.config, "USE_QUARANTINE",        True)
+
+    open(folderA + "/file.txt", "w").write("version A")
+    open(folderB + "/file.txt", "w").write("version B")
+    import os
+    os.utime(folderA + "/file.txt", (1000, 1000))
+    os.utime(folderB + "/file.txt", (2000, 2000))
+
+    with patch(PATCH_WRITE,   return_value=None), \
+         patch(PATCH_SUMMARY, return_value=""), \
+         patch(PATCH_DUMP,    return_value=None), \
+         patch(PATCH_SCANRES, return_value=None), \
+         patch("src.engine.compare_engine.handle_delete") as mock_delete:
+        results, _ = make_call(folderA, folderB, output)
+
+    assert mock_delete.called
+    _, kwargs = mock_delete.call_args
+    assert "quarantine" in kwargs["quarantine_dir"]
