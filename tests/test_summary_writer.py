@@ -32,15 +32,15 @@ def test_print_summary_shows_zero_counts():
 
 def test_print_summary_counts_matches():
     matches = [
-        ("file1.txt", "pathA", "pathB"),
-        ("file2.txt", "pathA", "pathB"),
+        ("file1.txt", "pathA", "pathB", None),
+        ("file2.txt", "pathA", "pathB", None),
     ]
     result = print_summary(matches, [], [])
     assert_summary_line(result, "Total Exact Matches:", 2)
 
 
 def test_print_summary_counts_mismatches():
-    mismatched = [("file1.txt", "pathA", [])]
+    mismatched = [("file1.txt", "pathA", [], None)]
     result = print_summary([], mismatched, [])
     assert_summary_line(result, "Total Mismatches:", 1)
 
@@ -53,30 +53,30 @@ def test_print_summary_counts_missing():
 def test_print_summary_detects_multi_match():
     # Same filename appearing twice in matches = multi match
     matches = [
-        ("file.txt", "pathA1", "pathB1"),
-        ("file.txt", "pathA1", "pathB2"),
+        ("file.txt", "pathA1", "pathB1", None),
+        ("file.txt", "pathA1", "pathB2", None),
     ]
     result = print_summary(matches, [], [])
     assert_summary_line(result, "Multi-Match Cases:", 1)
 
 def test_print_summary_no_multi_match_when_unique():
     matches = [
-        ("file1.txt", "pathA", "pathB"),
-        ("file2.txt", "pathA", "pathB"),
+        ("file1.txt", "pathA", "pathB", None),
+        ("file2.txt", "pathA", "pathB", None),
     ]
     result = print_summary(matches, [], [])
     assert_summary_line(result, "Multi-Match Cases:", 0)
 
 def test_print_summary_detects_mixed_case():
     # File appears in both matches and mismatched = mixed case
-    matches = [("file.txt", "pathA", "pathB1")]
-    mismatched = [("file.txt", "pathA", [("pathB2", 100, 0)])]
+    matches = [("file.txt", "pathA", "pathB1", None)]
+    mismatched = [("file.txt", "pathA", [("pathB2", 100, 0)], None)]
     result = print_summary(matches, mismatched, [])
     assert_summary_line(result, "Mixed Match/Mismatch:", 1)
 
 def test_print_summary_no_mixed_case_when_clean():
-    matches = [("file1.txt", "pathA", "pathB")]
-    mismatched = [("file2.txt", "pathA", [])]
+    matches = [("file1.txt", "pathA", "pathB", None)]
+    mismatched = [("file2.txt", "pathA", [], None)]
     result = print_summary(matches, mismatched, [])
     assert_summary_line(result, "Mixed Match/Mismatch:", 0)
 
@@ -99,8 +99,8 @@ def test_build_summary_file_contains_headers(tmp_path):
     assert "RECONCILIATION REPORT" in content
 
 def test_build_summary_shows_correct_counts(tmp_path):
-    matches   = [("file1.txt", "pathA", "pathB")]
-    mismatched = [("file2.txt", "pathA", [])]
+    matches   = [("file1.txt", "pathA", "pathB", None)]
+    mismatched = [("file2.txt", "pathA", [], None)]
     missing   = [("file3.txt", "pathA"), ("file4.txt", "pathA")]
     build_summary(str(tmp_path), matches, mismatched, missing)
     result = read_txt(str(tmp_path / "summary.txt"))
@@ -119,24 +119,24 @@ def test_build_summary_progress_callback_called(tmp_path):
 
 def test_build_summary_detects_multi_match(tmp_path):
     matches = [
-        ("file.txt", "pathA", "pathB1"),
-        ("file.txt", "pathA", "pathB2"),
+        ("file.txt", "pathA", "pathB1", None),
+        ("file.txt", "pathA", "pathB2", None),
     ]
     build_summary(str(tmp_path), matches, [], [])
     result = read_txt(str(tmp_path / "summary.txt"))
     assert_summary_line(result, "Multi-Match Cases:", 1)
 
 def test_build_summary_detects_mixed_case(tmp_path):
-    matches   = [("file.txt", "pathA", "pathB1")]
-    mismatched = [("file.txt", "pathA", [("pathB2", 100, 0)])]
+    matches   = [("file.txt", "pathA", "pathB1", None)]
+    mismatched = [("file.txt", "pathA", [("pathB2", 100, 0)], None)]
     build_summary(str(tmp_path), matches, mismatched, [])
     result = read_txt(str(tmp_path / "summary.txt"))
     assert_summary_line(result, "Mixed Match/Mismatch:", 1)
 
 def test_build_summary_content_matches_print_summary(tmp_path):
     """build_summary file content should match print_summary output."""
-    matches   = [("file1.txt", "pathA", "pathB")]
-    mismatched = [("file2.txt", "pathA", [])]
+    matches   = [("file1.txt", "pathA", "pathB", None)]
+    mismatched = [("file2.txt", "pathA", [], None)]
     missing   = [("file3.txt", "pathA")]
 
     build_summary(str(tmp_path), matches, mismatched, missing)
@@ -151,3 +151,26 @@ def assert_summary_line(result, label, value):
     lines = result.splitlines()
     assert any(label in line and str(value) in line for line in lines), \
         f"Expected '{label}' with value '{value}' in summary"
+
+def test_print_summary_counts_deleted():
+    matches = [
+        ("file1.txt", "pathA", "pathB", "DELETED"),
+        ("file2.txt", "pathA", "pathB", None),
+    ]
+    mismatched = [("file3.txt", "pathA", [], "DELETED")]
+    result = print_summary(matches, mismatched, [])
+    assert_summary_line(result, "Files Deleted:", 2)
+
+
+def test_print_summary_counts_quarantined():
+    matches = [("file1.txt", "pathA", "pathB", "QUARANTINED")]
+    mismatched = [("file2.txt", "pathA", [], "QUARANTINED")]
+    result = print_summary(matches, mismatched, [])
+    assert_summary_line(result, "Files Quarantined:", 2)
+
+
+def test_print_summary_zero_deleted_when_no_action():
+    matches = [("file1.txt", "pathA", "pathB", None)]
+    result = print_summary(matches, [], [])
+    assert_summary_line(result, "Files Deleted:", 0)
+

@@ -64,12 +64,17 @@ def print_summary(matches,
     diag(f"Print Summary total matches: {total_matches} - total mismatches: {total_mismatches} - total missing: {total_missing}")
 
     from collections import Counter
-    match_names = [name for name, _, _ in matches]
+    match_names = [name for name, _,_,_ in matches]
     multi_match_counts = Counter(match_names)
     multi_match_cases = sum(1 for k, v in multi_match_counts.items() if v > 1)
 
-    mismatch_names = {name for name, _, _ in mismatched}
+    mismatch_names = {name for name,_,_,_ in mismatched}
     mixed_cases = sum(1 for name in mismatch_names if name in multi_match_counts)
+
+    deleted_count = sum(1 for _, _, _, action in matches if action == "DELETED") + \
+                    sum(1 for _, _, _, action in mismatched if action == "DELETED")
+    quarantined_count = sum(1 for _, _, _, action in matches if action == "QUARANTINED") + \
+                        sum(1 for _, _, _, action in mismatched if action == "QUARANTINED")
 
     summary = [
         "=============== RECONCILIATION REPORT ===============",
@@ -88,6 +93,9 @@ def print_summary(matches,
         f"   Multi-Match Cases:          {multi_match_cases}",
         f"   Mixed Match/Mismatch:       {mixed_cases}",
         "",
+        f"   Files Deleted:              {deleted_count}"
+        f"   Files Quarantined:          {quarantined_count}"
+        ""
         "====================================================="
     ]
 
