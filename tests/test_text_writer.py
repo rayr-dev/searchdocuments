@@ -40,7 +40,7 @@ def test_txt_empty_data_has_only_headers(tmp_path):
     write_text_output(str(tmp_path), [], [], [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     lines = [line for line in content.splitlines() if line.strip()]
-    assert len(lines) == 3  # only the 3 section headers
+    assert len(lines) == 7 # 4 count lines + 3 section headers
 
 # -----------------------------
 # Matches tests
@@ -204,3 +204,14 @@ def test_txt_writes_action_for_mismatch(sample_files):
     write_text_output(output_dir, [], mismatched, [])
     content = read_txt(os.path.join(output_dir, "comparison.txt"))
     assert "Action: QUARANTINED" in content
+
+def test_txt_has_count_lines(tmp_path):
+    write_text_output(str(tmp_path), [], [], [],
+                      source_count=10, target_count=20,
+                      source_unique=5, target_unique=8)
+    content = read_txt(str(tmp_path / "comparison.txt"))
+    assert "Total Files in Source:   10" in content
+    assert "Total Files in Target:   20" in content
+    assert "Unique Filenames Source: 5" in content
+    assert "Unique Filenames Target: 8" in content
+

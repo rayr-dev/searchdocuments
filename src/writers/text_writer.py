@@ -11,6 +11,10 @@ def write_text_output(output_dir,
                       matches,
                       mismatched,
                       missing,
+                      source_count=0,
+                      target_count=0,
+                      source_unique=0,
+                      target_unique=0,
                       progress_callback=None,
                       status_callback=None):
     diag("TEXT_WRITER/write_text_output Starting")
@@ -25,6 +29,14 @@ def write_text_output(output_dir,
 
     try:
         with open(txt_path, "w", encoding="utf-8", errors="replace") as f:
+            # ------------------------------------------------------------
+            # Summary counts at top
+            # ------------------------------------------------------------
+            f.write(f"Total Files in Source:   {source_count}\n")
+            f.write(f"Total Files in Target:   {target_count}\n")
+            f.write(f"Unique Filenames Source: {source_unique}\n")
+            f.write(f"Unique Filenames Target: {target_unique}\n")
+            f.write("\n")
 
             # ------------------------------------------------------------
             # Exact Matches
