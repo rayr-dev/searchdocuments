@@ -16,6 +16,10 @@ def write_excel_output(output_dir,
                        matches,
                        mismatched,
                        missing,
+                       source_count=0,
+                       target_count=0,
+                       source_unique=0,
+                       target_unique=0,
                        progress_callback=None,
                        status_callback=None
                        ):
@@ -35,6 +39,15 @@ def write_excel_output(output_dir,
         wb = Workbook()
         ws = wb.active
         ws.title = "Comparison"
+
+        # ------------------------------------------------------------
+        # Summary counts at top
+        # ------------------------------------------------------------
+        ws.append(["Total Files in Source:", source_count])
+        ws.append(["Total Files in Target:", target_count])
+        ws.append(["Unique Filenames Source:", source_unique])
+        ws.append(["Unique Filenames Target:", target_unique])
+        ws.append([])  # blank row
 
         header = [
             "Status",
