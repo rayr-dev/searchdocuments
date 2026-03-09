@@ -14,6 +14,10 @@ def write_csv_output(output_dir,
                      matches,
                      mismatched,
                      missing,
+                     source_count=0,
+                     target_count=0,
+                     source_unique=0,
+                     target_unique=0,
                      progress_callback=None,
                      status_callback=None
                      ):
@@ -29,6 +33,13 @@ def write_csv_output(output_dir,
     try:
         with open(csv_path, "w", newline="", encoding="utf-8", errors="replace") as f:
             writer = csv.writer(f)
+
+            writer.writerow(["Total Files in Source:", source_count])
+            writer.writerow(["Total Files in Target:", target_count])
+            writer.writerow(["Unique Filenames Source:", source_unique])
+            writer.writerow(["Unique Filenames Target:", target_unique])
+            writer.writerow([])  # blank row
+
             writer.writerow(["Status", "Filename", "Path A", "Timestamp A", "Path B", "Timestamp B", "Action"])
 
             # ------------------------------------------------------------
