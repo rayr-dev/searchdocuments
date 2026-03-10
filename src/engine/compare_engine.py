@@ -200,13 +200,32 @@ def compare_folders_recursive(folderA,
         progress_callback(50)
 
     # ------------------------------------------------------------
+    # TARGET ONLY - files in Target not seen in Source
+    # ------------------------------------------------------------
+    matched_rels = set()
+    for rel, _, _, _ in matches:
+        matched_rels.add(rel)
+    for rel, _, _, _ in mismatched:
+        matched_rels.add(rel)
+
+    target_only = []
+    for rel, candidates in filesB.items():
+        if rel not in matched_rels:
+            for pathB, _, _ in candidates:
+                target_only.append((rel, pathB))
+            diag(f"TARGET ONLY: {rel}")
+
+
+    diag(f"SCAN: Target only files = {len(target_only)}")
+    # ------------------------------------------------------------
     # DIAGNOSTIC DUMP
     # ------------------------------------------------------------
     dump_diagnostics(
         {
-            "matches" : matches,
+            "matches": matches,
             "mismatched": mismatched,
-            "missing" : missing
+            "missing": missing,
+            "target_only": target_only
         },
         output_dir
     )
@@ -224,6 +243,7 @@ def compare_folders_recursive(folderA,
         matches,
         mismatched,
         missing,
+        target_only=target_only,
         source_count=source_count,
         target_count=target_count,
         source_unique=len(filesA),
@@ -240,11 +260,13 @@ def compare_folders_recursive(folderA,
         "matches": matches,
         "mismatched": mismatched,
         "missing": missing,
-        "source_count" : source_count,
-        "target_count" : target_count,
-        "source_unique" : len(filesA),
-        "target_unique" : len(filesB)
+        "target_only": target_only,
+        "source_count": source_count,
+        "target_count": target_count,
+        "source_unique": len(filesA),
+        "target_unique": len(filesB)
     }
+
     diag("COMPARE_ENGINE/compare_folders_recursive: Ending compare_folders_recursive")
     # Build Summary Report
     summary_text = print_summary(
