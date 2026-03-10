@@ -145,6 +145,39 @@ call :check_result "S6" "%REPORTS%\%S%_output.txt" "Mixed Match/Mismatch:       
 echo.
 
 REM ================================================
+REM SCENARIO 7a - Corrupted Files (Fast Mode)
+REM ================================================
+echo [S7a] Scenario 7 - Corrupted Files (Fast Mode)...
+set S=scenario7_corrupted
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S%_fast --findall > %REPORTS%\%S%_fast_output.txt 2>&1
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Total Files in Source:      3" "S7a-SrcFiles"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Total Files in Target:      3" "S7a-TgtFiles"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Unique filenames in Source: 3" "S7a-SrcUniq"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Unique filenames in Target: 3" "S7a-TgtUniq"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Total Exact Matches:        3" "S7a-Matches"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Total Mismatches:           0" "S7a-Mismatches"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Total Missing Files:        0" "S7a-Missing"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Multi-Match Cases:          0" "S7a-Multi"
+call :check_result "S7a" "%REPORTS%\%S%_fast_output.txt" "Mixed Match/Mismatch:       0" "S7a-Mixed"
+echo.
+
+REM ================================================
+REM SCENARIO 7b - Corrupted Files (Hash Only Mode)
+REM ================================================
+echo [S7b] Scenario 7 - Corrupted Files (Hash Only Mode)...
+set S=scenario7_corrupted
+%CLI% %TESTDATA%\%S%\source %TESTDATA%\%S%\target -o %REPORTS%\%S%_hash --findall --hashonly > %REPORTS%\%S%_hash_output.txt 2>&1
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Total Files in Source:      3" "S7b-SrcFiles"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Total Files in Target:      3" "S7b-TgtFiles"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Unique filenames in Source: 3" "S7b-SrcUniq"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Unique filenames in Target: 3" "S7b-TgtUniq"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Total Exact Matches:        0" "S7b-Matches"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Total Mismatches:           3" "S7b-Mismatches"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Total Missing Files:        0" "S7b-Missing"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Multi-Match Cases:          0" "S7b-Multi"
+call :check_result "S7b" "%REPORTS%\%S%_hash_output.txt" "Mixed Match/Mismatch:       0" "S7b-Mixed"
+echo.
+REM ================================================
 REM RESULTS SUMMARY
 REM ================================================
 echo ================================================

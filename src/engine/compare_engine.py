@@ -82,7 +82,7 @@ def compare_folders_recursive(folderA,
             continue
 
         found_match = False
-        match_pathB = None
+        match_pathBs = []
         mismatch_list = []
 
         for pathB, sizeB, mtimeB in candidatesB:
@@ -96,7 +96,7 @@ def compare_folders_recursive(folderA,
                 if hashA == hashB:  # pragma: no cover
                     diag(f"HASH ONLY MODE - Hashes match: {rel}")
                     found_match = True # pragma: no cover
-                    match_pathB = pathB # pragma: no cover # noqa: F841
+                    match_pathBs.append(pathB) # pragma: no cover # noqa: F841
                     continue  # pragma: no cover
                 # If hash doesn't match fall through to mismatch
                 diag(f"HASH ONLY MODE - Hashes differ: {rel}")  # pragma: no cover
@@ -115,7 +115,7 @@ def compare_folders_recursive(folderA,
                     if hashA == hashB:
                         diag(f"HASH CONFIRMED MATCH: {rel}")
                         found_match = True
-                        match_pathB = pathB # noqa: F841
+                        match_pathBs.append(pathB) # noqa: F841
                         continue
                     else:
                         diag(f"HASH REJECTED TIMESTAMP MATCH: {rel}")
@@ -125,7 +125,7 @@ def compare_folders_recursive(folderA,
                     # FAST MODE - timestamp+size match is sufficient
                     diag(f"FAST MODE MATCH: {rel}")
                     found_match = True
-                    match_pathB = pathB # noqa: F841
+                    match_pathBs.append(pathB) # noqa: F841
                     continue
 
             # SAME SIZE but timestamp differs - try hash if accurate mode
@@ -136,7 +136,7 @@ def compare_folders_recursive(folderA,
                 if hashA == hashB:
                     diag(f"HASH MATCH ON SAME SIZE: {rel}")
                     found_match = True
-                    match_pathB = pathB # noqa: F841
+                    match_pathBs.append(pathB) # noqa: F841
                     continue
                 else:
                     diag(f"HASH MISMATCH ON SAME SIZE: {rel}")
@@ -167,7 +167,8 @@ def compare_folders_recursive(folderA,
             else:
                 match_action = None
 
-            matches.append((rel, pathA, match_pathB, match_action))
+            for match_pathB in match_pathBs:
+                matches.append((rel, pathA, match_pathB, match_action))
 
             if mismatch_list:
                 diag(f"FOUND MISMATCH: {rel}")

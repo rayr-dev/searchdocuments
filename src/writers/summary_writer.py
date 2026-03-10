@@ -93,8 +93,8 @@ def print_summary(matches,
         f"   Multi-Match Cases:          {multi_match_cases}",
         f"   Mixed Match/Mismatch:       {mixed_cases}",
         "",
-        f"   Files Deleted:              {deleted_count}"
-        f"   Files Quarantined:          {quarantined_count}"
+        f"   Files Deleted:              {deleted_count}",
+        f"   Files Quarantined:          {quarantined_count}",
         ""
         "====================================================="
     ]

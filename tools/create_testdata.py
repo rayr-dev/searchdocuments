@@ -352,6 +352,42 @@ def build_scenario6(base: str):
         write_file(os.path.join(root, "policy document.pdf"),        make_pdf("Policy"),     T1)
 
 
+def build_scenario7(base: str):
+    """
+    Scenario 7 - Corrupted files.
+    Files have identical names, sizes, and timestamps in source and target
+    but different byte content (simulating corruption or tampering).
+    Expected Fast Mode:  all 3 = Exact Match (false positive)
+    Expected Hash Mode:  all 3 = Mismatch (correctly detected)
+    """
+    print("  Building scenario7_corrupted...")
+
+    # Make content strings of identical length but different bytes
+    txt_source  = "Original file content v1.0"
+    txt_corrupt = "Corrupted file content XX."  # same length
+
+    xlsx_source  = make_xlsx()
+    xlsx_corrupt = bytearray(xlsx_source)
+    xlsx_corrupt[100] ^= 0xFF  # flip bits at offset 100
+    xlsx_corrupt = bytes(xlsx_corrupt)
+
+    docx_source  = make_docx()
+    docx_corrupt = bytearray(docx_source)
+    docx_corrupt[100] ^= 0xFF  # flip bits at offset 100
+    docx_corrupt = bytes(docx_corrupt)
+
+    source = os.path.join(base, "source")
+    target = os.path.join(base, "target")
+
+    write_text(os.path.join(source, "report.txt"),   txt_source,  T1)
+    write_text(os.path.join(target, "report.txt"),   txt_corrupt, T1)
+
+    write_file(os.path.join(source, "data.xlsx"),    xlsx_source,  T1)
+    write_file(os.path.join(target, "data.xlsx"),    xlsx_corrupt, T1)
+
+    write_file(os.path.join(source, "document.docx"), docx_source,  T1)
+    write_file(os.path.join(target, "document.docx"), docx_corrupt, T1)
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -363,6 +399,7 @@ SCENARIOS = [
     ("scenario4_empty_target",  build_scenario4),
     ("scenario5_deep_nested",   build_scenario5),
     ("scenario6_special_chars", build_scenario6),
+    ("scenario7_corrupted",     build_scenario7),
 ]
 
 
