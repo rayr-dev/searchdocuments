@@ -11,6 +11,7 @@ def write_text_output(output_dir,
                       matches,
                       mismatched,
                       missing,
+                      target_only=None,
                       source_count=0,
                       target_count=0,
                       source_unique=0,
@@ -18,6 +19,9 @@ def write_text_output(output_dir,
                       progress_callback=None,
                       status_callback=None):
     diag("TEXT_WRITER/write_text_output Starting")
+
+    target_only = target_only or []
+
     txt_path = os.path.join(output_dir, "comparison.txt")
     diag(f"Writing comparison report: {txt_path}")
 

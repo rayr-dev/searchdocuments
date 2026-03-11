@@ -15,6 +15,7 @@ def write_all_reports(output_dir,
                       matches,
                       mismatched,
                       missing,
+                      target_only=None,
                       source_count=0,
                       target_count=0,
                       source_unique=0,
@@ -28,6 +29,8 @@ def write_all_reports(output_dir,
     Provides consistent diagnostic output and callback handling.
     """
     diag("WRITE_ALL_REPORTS/write_all_reports Starting")
+
+    target_only = target_only or []
 
     # Ensure output directory exists
     try:

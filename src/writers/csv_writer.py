@@ -14,6 +14,7 @@ def write_csv_output(output_dir,
                      matches,
                      mismatched,
                      missing,
+                     target_only=None,
                      source_count=0,
                      target_count=0,
                      source_unique=0,
@@ -23,6 +24,9 @@ def write_csv_output(output_dir,
                      ):
 
     diag("CSV_WRITER/write_csv_output")
+
+    target_only = target_only or []
+
     csv_path = os.path.join(output_dir, "comparison.csv")
 
     if status_callback:
