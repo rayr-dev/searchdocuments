@@ -4,7 +4,8 @@ __pycache__/
 *.pyo
 *.pyd
 *.egg-info/
-
+# Pytest
+.pytest_cache/
 
 #Virtual environments
 venv/
@@ -28,10 +29,17 @@ dist/
 
 # Quarantine folder
 Quarantine/
+quarantine/
 
 # IDE files
 .vscode/
+
+# PyCharm / JetBrains
 .idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
 
 # do not checkin these files
 *.tmp
@@ -40,19 +48,10 @@ Quarantine/
 ~*.*
 *~
 
-# IDE files
-.vscode/
-.idea/
-
 # Generated reports
 # Test output
 testdata/reports/
 testdata/debug/
-
-
-# JSON exception for app version
-*.json
-!src/app_version.json
 
 # Executables and installers
 *.exe
@@ -68,16 +67,12 @@ testdata/debug/
 Thumbs.db
 desktop.ini
 
-# VSCode
-.vscode/
-
-# PyCharm
-.idea/
-
-# Debug output
+# Generated reports and debug output
 test_debug/
+testdata/
 
-#Python specific
-venv/
-__pycache__/
-.pytest_cache/dir
+# JSON exception for app version
+*.json
+!src/app_version.json
+
+
