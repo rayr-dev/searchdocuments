@@ -1,5 +1,6 @@
 # Search Documents — File Reconciliation Tool
 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-308%20passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25%20non--GUI-brightgreen)
