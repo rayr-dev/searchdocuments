@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-308%20passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25%20non--GUI-brightgreen)
+![CI](https://github.com/rayr-dev/searchdocuments/actions/workflows/ci.yml/badge.svg)fi
 
 A fast, reliable utility for comparing two folders of documents and reconciling their contents. Produces Excel, CSV, and text reports and can optionally delete or quarantine duplicate or outdated files.
 
