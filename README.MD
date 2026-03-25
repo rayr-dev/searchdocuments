@@ -1,219 +1,234 @@
-# Reconciliation Tool — User Guide
+# Search Documents — File Reconciliation Tool
 
-The Reconciliation Tool is a fast, reliable utility for comparing two folders of documents to accomplish the following objectives:
-- The TARGET folder is meant to be the GOLD STANDARD for file system structure.  
-- SOURCE Folder
-Files that SHOULD exist in the TARGET
-May have different folder structures than TARGET 
-Represents files need to be reconciled in the TARGET
--  TARGET
-Destination - being normalized over time 
-Gold standard LOCATION structure
-May have files in wrong locations
-May have duplicate copies
-May be missing files from SOURCE
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Tests](https://img.shields.io/badge/tests-308%20passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-100%25%20non--GUI-brightgreen)
 
-- Files that match exactly  
-- Files that exist in both folders but differ  
-- Files that are missing from one folder  
-- Files that appear in multiple locations  
-
-| Result      | Meaning                                  | Required Action                                              |
-|-------------|------------------------------------------|--------------------------------------------------------------|
-| Exact Match | SOURCE files exists correctly in TARGET  | Candidates to remove from SOURCE                             |
-| Missing     | SOURCE file not anywhere in the TARGET   | Candidates to move to correct TARGET location                |
-| Mismatch    | Same filename diffent content            | Reconcile GOLD STANDARD file, remove others                  |
-| Multi-Match | SOURCE file in multiple TARGET locations | Clean up multiple copies in TARGET locations                 |
-| Mixed       | Source TARGET copies match some don't    | Candidate to clean up duplicates and mixed content in SOURCE |
-
-It produces clear Excel, CSV, and text reports and can optionally delete or quarantine duplicate or outdated files.
-
-This guide explains how to run the tool, what each mode does, and how to interpret the results.
+A fast, reliable utility for comparing two folders of documents and reconciling their contents. Produces Excel, CSV, and text reports and can optionally delete or quarantine duplicate or outdated files.
 
 ---
 
-## 1. What the Tool Does
+## What It Does
 
-The Reconciliation Tool compares **Folder A** (the source) to **Folder B** (the target).  
-For every file in Folder A, it checks Folder B for:
+The tool compares a **Source folder** (Folder A) against a **Target folder** (Folder B).
 
-### ✔ Exact matches  
-Same name + same timestamp/size/hash.
+| Result | Meaning | Required Action |
+|---|---|---|
+| Exact Match | Source file exists correctly in Target | Candidate to remove from Source |
+| Missing | Source file not found anywhere in Target | Candidate to move to correct Target location |
+| Mismatch | Same filename, different content | Reconcile gold standard file, remove others |
+| Multi-Match | Source file found in multiple Target locations | Clean up multiple copies in Target |
+| Mixed | Some Target copies match, some don't | Clean up duplicates and mixed content |
+| Target Only | File exists in Target but not in Source | Review for stale or rogue files |
 
-### ✔ Mismatches  
-Same name but different content or metadata.
+### Source vs Target
 
-### ✔ Missing files  
-Files present in A but not in B.
-
-### ✔ Multiple matches  
-If the same filename appears in multiple locations in B, the tool can list all of them.
-
-### ✔ Optional cleanup  
-You can choose to:
-
-- Delete exact matches  
-- Delete mismatch candidates  
-- Move files to a quarantine folder  
-- Perform a dry‑run (no changes made)
+- **Target** is the gold standard for file system structure — the destination being normalized over time. It may have files in wrong locations, duplicate copies, or missing files from Source.
+- **Source** contains files that should exist in Target. It may have a different folder structure than Target and represents files that need to be reconciled.
 
 ---
 
-## 2. How to Run the Tool
+## Quick Start
 
-When you launch the EXE, you’ll see a simple interface:
+### Prerequisites
+- Python 3.10 or later
+- Windows 10 or later (Linux support planned)
 
-1. Select **Folder A**  
-2. Select **Folder B**  
-3. Choose your comparison options  
-4. Choose your deletion/quarantine options  
-5. Click **Run Comparison**
+### Clone and Install
+```bash
+git clone https://github.com/rayr-dev/searchdocuments.git
+cd searchdocuments
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-The tool will:
+### Run the GUI
+```bash
+python src\gui\gui_main.py
+```
 
-- Scan both folders  
-- Compare files  
-- Generate Excel, CSV, and text reports  
-- Perform optional cleanup actions  
+### Run the CLI
+```bash
+python src\cli\cli_main.py <source_folder> <target_folder> [options]
+```
 
-## Running from command line
-Comand Line >ReconciliationTool [source folder [folder to check] 
-(Options) 
+---
+
+## CLI Options
+```
+python src\cli\cli_main.py <source> <target> [options]
+```
+
 | Option | Meaning |
-|----------------------|------------------------------------|
-|--hashonly            | Enable HASH_ONLY_MODE              |
-|--find-all            | Enable FIND_ALL_LOCATIONS_MODE     |
-|--delete-matches      | Enable DELETE_EXACT_MATCHES        |
-|--delete-candidates   | Enable DELETE_CANDIDATES           | 
-|--no-quarantine       | Disable USE_QUARANTINE             |
-|--no-dry-run          | Disable DRY_RUN                    |
-|--silent              | Suppress all console output        |
-|--timestamped-output  | Create a timestamped output folder |
+|---|---|
+| `--hashonly` | Use SHA-256 hash only (ignores timestamp and size) |
+| `--findall` | Find all locations of a file in Target |
+| `--delete-matches` | Delete exact matches from Source |
+| `--delete-candidates` | Delete mismatch candidates from Source |
+| `--no-quarantine` | Delete files instead of quarantining them |
+| `--no-dry-run` | Execute deletions (default is dry-run) |
+| `--silent` | Suppress all console output |
+| `--timestamped-output` | Create a timestamped output subfolder |
 
 ---
 
-## 3. Understanding the Output Files
+## Output Files
 
-After running the comparison, the tool creates three output files in the same directory as the EXE:
+After running, the tool creates three report files in the output folder:
 
-### 3.1 Excel Report (`comparison.xlsx`)
-
-This is the most user‑friendly output.
-
-It includes:
+### Excel Report (`comparison.xlsx`)
 
 | Color | Meaning |
-|-------|---------|
-| **Green** | Exact match |
-| **Yellow** | Mismatch |
-| **Red** | Missing in Folder B |
+|---|---|
+| Green | Exact match |
+| Yellow | Mismatch |
+| Red | Missing in Target |
+| Orange | Target Only (exists in Target, not in Source) |
 
-Each row shows:
+Each row shows: Status, Filename, Path A, Timestamp A, Path B, Timestamp B, Action taken.
 
-- Status  
-- Filename  
-- Full path in A  
-- Timestamp in A  
-- Full path in B  
-- Timestamp in B  
+### CSV Report (`comparison.csv`)
+Same data as Excel, suitable for importing into other systems.
 
-If a file appears multiple times in Folder B, each location is listed separately.
+### Text Report (`comparison.txt`)
+A readable summary grouped into: Exact Matches, Mismatches, Missing Files, Target Only.
 
----
+### Summary Report (`summary.txt`)
+```
+=============== RECONCILIATION REPORT ===============
+Source Statistics:
+   Total Files in Source:      X
+   Total Files in Target:      X
+   Unique filenames in Source: X
+   Unique filenames in Target: X
 
-### 3.2 CSV Report (`comparison.csv`)
+Reconciliation Results:
+   Total Exact Matches:        X
+   Total Mismatches:           X
+   Total Missing Files:        X
+   Total Target Only Files:    X
 
-A spreadsheet‑friendly version of the same data.  
-Useful for importing into Excel, Access, or other systems.
+   Multi-Match Cases:          X
+   Mixed Match/Mismatch:       X
 
----
-
-### 3.3 Text Report (`comparison.txt`)
-
-A simple, readable summary grouped into:
-
-- Exact Matches  
-- Mismatches  
-- Missing Files  
-
----
-
-## 4. Comparison Modes
-
-### 4.1 Timestamp Comparison  
-Fastest method.  
-Files match if their timestamps are within 1 second.
-
-### 4.2 Size Comparison  
-Files match if their sizes are identical.
-
-### 4.3 Hash Comparison  
-Files match if their SHA‑256 hash is identical.  
-Most accurate, slower.
-
-### 4.4 Hash‑Only Mode  
-Ignores timestamps and sizes.  
-Uses only SHA‑256 hashing.
-
-### 4.5 Find‑All‑Locations Mode  
-If a file appears multiple times in Folder B, all locations are listed.
+   Files Deleted:              X
+   Files Quarantined:          X
+=====================================================
+```
 
 ---
 
-## 5. Deletion and Quarantine Options
+## Comparison Modes
 
-### 5.1 Dry‑Run Mode  
-No files are deleted or moved.  
-Actions are logged only.
+| Mode | How It Works | Speed |
+|---|---|---|
+| Fast (default) | Timestamp + size | Fastest |
+| Hash Compare | Timestamp + size + SHA-256 | Slower |
+| Hash Only (`--hashonly`) | SHA-256 only | Slower |
 
-### 5.2 Delete Exact Matches  
-Removes files from Folder B that match Folder A exactly.
-
-### 5.3 Delete Mismatch Candidates  
-Removes files from Folder B that have the same name but different content.
-
-### 5.4 Quarantine Mode  
-Instead of deleting files, moves them into a **Quarantine** folder created next to the EXE.
-
-This is the safest cleanup option.
+> **Note:** Fast Mode cannot detect corrupted files with identical size and timestamp. Use Hash Only Mode when content integrity is critical.
 
 ---
 
-## 6. Logs
+## Deletion and Quarantine Options
 
-All deletion or quarantine actions are recorded in:
+| Mode | Behaviour |
+|---|---|
+| Dry-Run (default) | No files changed — actions logged only |
+| Quarantine (default when deleting) | Files moved to a `quarantine/` subfolder |
+| Delete | Files permanently removed |
 
-## File_compare_deletions.logged
-This includes:
+Deletion applies to **Source** files:
+- `--delete-matches` removes Source files that match exactly in Target
+- `--delete-candidates` removes Source mismatch candidates
 
-- Timestamp  
-- Action (deleted, quarantined, dry‑run)  
-- File path  
-- Reason (exact match, mismatch, duplicate)  
-
----
-
-## 7. System Requirements
-
-- Windows 10 or later  
-- Python not required (EXE is standalone)  
-- No admin rights needed unless deleting protected files  
+All actions are logged to `file_compare_deletions.log`.
 
 ---
 
-## 8. Troubleshooting
+## Deletion Log
 
-### “Access Denied” errors  
-The file may be locked or require admin permissions.
-
-### Excel report won’t open  
-Ensure Excel is installed and not already running in safe mode.
-
-### Quarantine folder not created  
-Check that the EXE has permission to write to its directory.
+All deletion and quarantine actions are recorded with:
+- Timestamp
+- Action (deleted, quarantined, dry-run)
+- File path
+- Reason (exact match, mismatch, duplicate)
 
 ---
 
-## 9. Support
+## Project Structure
+```
+searchdocuments/
+├── src/
+│   ├── cli/            # Command line interface
+│   ├── engine/         # Core comparison engine
+│   ├── gui/            # Tkinter GUI
+│   ├── utilities/      # Logging, path utils, safe delete, scan
+│   ├── writers/        # Excel, CSV, text, summary report writers
+│   └── config.py       # Feature flags and configuration
+├── tests/              # Pytest test suite (308 tests)
+├── tools/
+│   └── create_testdata.py   # Generates all smoke test scenarios
+├── post_build_test.cmd      # 72-check smoke test suite
+├── requirements.txt
+└── README.md
+```
 
-For questions, enhancements, or bug reports, contact the developer or submit an issue in the repository.
+---
+
+## Development
+
+### Running Tests
+```bash
+pytest -v
+```
+
+### Running Smoke Tests
+```bash
+# Regenerates all test data and runs 72 checks across 7 scenarios
+post_build_test.cmd
+```
+
+### Test Scenarios
+
+| Scenario | Description |
+|---|---|
+| 1 — Identical Files | All files match exactly including duplicates |
+| 2 — Mixed Results | Mix of matches, mismatches, and missing files |
+| 3 — Empty Source | Source folder is empty |
+| 4 — Empty Target | Target folder is empty |
+| 5 — Deep Nested | Files nested 7 levels deep |
+| 6 — Special Characters | Filenames with dashes, dots, spaces, long names |
+| 7 — Corrupted Files | Identical size/name but different bytes — proves Fast Mode limitation |
+
+### Building the EXE
+```bash
+build.cmd
+```
+Produces a standalone Windows EXE in `dist/`. No Python installation required to run.
+
+---
+
+## Troubleshooting
+
+**Access Denied errors** — The file may be locked or require admin permissions.
+
+**Excel report won't open** — Ensure Excel is installed and not already running in safe mode.
+
+**Quarantine folder not created** — Check that the tool has write permission to the output directory.
+
+---
+
+## System Requirements
+
+- Windows 10 or later
+- Python 3.10+ (for running from source)
+- No admin rights needed unless deleting protected files
+
+---
+
+## Support
+
+For questions, enhancements, or bug reports, submit an issue at:
+https://github.com/rayr-dev/searchdocuments/issues
