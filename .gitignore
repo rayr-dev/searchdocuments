@@ -53,6 +53,9 @@ quarantine/
 testdata/reports/
 testdata/debug/
 
+# Code Coverage
+.coverage
+
 # Executables and installers
 *.exe
 *.msi
