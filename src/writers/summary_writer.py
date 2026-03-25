@@ -12,6 +12,7 @@ def build_summary(output_dir,
                   matches,
                   mismatched,
                   missing,
+                  target_only=None,
                   source_count=0,
                   target_count=0,
                   source_unique=0,
@@ -20,6 +21,9 @@ def build_summary(output_dir,
                   status_callback=None
                   ):
     diag("SUMMARY_WRITER/build_summary Starting")
+
+    target_only = target_only or []
+
     summary_path = os.path.join(output_dir, "summary.txt")
 
     if status_callback:
@@ -29,7 +33,10 @@ def build_summary(output_dir,
 
     # Delegate to print_summary for consistent output
     summary_text = print_summary(
-        matches, mismatched, missing,
+        matches,
+        mismatched,
+        missing,
+        target_only=target_only,
         source_count=source_count,  # ← pass counts through
         target_count=target_count,
         source_unique=source_unique,
@@ -50,12 +57,14 @@ def build_summary(output_dir,
 def print_summary(matches,
                   mismatched,
                   missing,
+                  target_only=None,
                   source_count=0,
                   target_count=0,
                   source_unique=0,
                   target_unique=0,
                   status_callback=None):
     logging.info("SUMMARY_WRITER/print_summary: Starting")
+    target_only = target_only or []
 
     total_matches = len(matches)
     total_mismatches = len(mismatched)
@@ -94,8 +103,9 @@ def print_summary(matches,
         f"   Mixed Match/Mismatch:       {mixed_cases}",
         "",
         f"   Files Deleted:              {deleted_count}",
+        f"   Total Target Only Files:    {target_only}",
         f"   Files Quarantined:          {quarantined_count}",
-        ""
+        "",
         "====================================================="
     ]
 

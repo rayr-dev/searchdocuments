@@ -111,6 +111,22 @@ def write_csv_output(output_dir,
                     tsA = ""
 
                 writer.writerow(["Missing in Folder B", name, pathA, tsA, "", ""])
+
+            # ------------------------------------------------------------
+            # Target Only Files
+            # ------------------------------------------------------------
+            for name, pathB in target_only:
+
+                if not pathB or not os.path.exists(pathB):
+                    diag(f"CSV: Skipping invalid pathB for target only: {pathB}")
+                    continue
+
+                try:
+                    tsB = datetime.fromtimestamp(os.path.getmtime(pathB)).strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    tsB = ""
+
+                writer.writerow(["Target Only", name, "", "", pathB, tsB, ""])
     except Exception as e:
         diag(f"ERROR writing CSV report: {e}")
         logging.error(f"Error writing CSV report {csv_path} - Exception: {e}")

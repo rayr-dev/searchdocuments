@@ -149,6 +149,28 @@ def write_excel_output(output_dir,
             ws.append(row)
             for cell in ws[ws.max_row]:
                 cell.fill = red
+        # ------------------------------------------------------------
+        # Target Only Files
+        # ------------------------------------------------------------
+        diag("Checkpoint Before Target Only")
+        orange = PatternFill(start_color="FFE0B2", end_color="FFE0B2", fill_type="solid")
+
+        for name, pathB in target_only:
+
+            if not pathB or not os.path.exists(pathB):
+                diag(f"Excel: Skipping invalid pathB for target only: {pathB}")
+                continue
+
+            try:
+                tsB = datetime.fromtimestamp(os.path.getmtime(pathB)).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                tsB = ""
+
+            row = ["Target Only", name, "", "", pathB, tsB, ""]
+            ws.append(row)
+            for cell in ws[ws.max_row]:
+                cell.fill = orange
+
         diag("Checkpoint Before Save")
 
         wb.save(excel_path)

@@ -174,3 +174,10 @@ def test_print_summary_zero_deleted_when_no_action():
     result = print_summary(matches, [], [])
     assert_summary_line(result, "Files Deleted:", 0)
 
+def test_summary_has_target_only_count(tmp_path):
+    target_only = [("file1.txt", "/target/file1.txt"), ("file2.txt", "/target/file2.txt")]
+    result = build_summary(str(tmp_path), [], [], [],
+                           target_only=target_only,
+                           source_count=0, target_count=2)
+    #assert "Total Target Only Files:   2" in result
+    assert_summary_line(result, "Total Target Only Files:", 2)

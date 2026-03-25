@@ -272,3 +272,40 @@ def test_excel_has_count_rows(tmp_path):
     assert rows[3][0] == "Unique Filenames Target:"
     assert rows[3][1] == 8
 
+def test_excel_writes_target_only(sample_files):
+    fileA, fileB, output_dir = sample_files
+    target_only = [("target_file.txt", fileB)]
+    write_excel_output(output_dir, [], [], [], target_only=target_only)
+    rows = read_xlsx(os.path.join(output_dir, "comparison.xlsx"))
+    statuses = [r[0] for r in rows if r[0] is not None]
+    assert "Target Only" in statuses
+
+def test_excel_target_only_row_has_orange_fill(sample_files):
+    fileA, fileB, output_dir = sample_files
+    target_only = [("target_file.txt", fileB)]
+    write_excel_output(output_dir, [], [], [], target_only=target_only)
+    wb = load_workbook(os.path.join(output_dir, "comparison.xlsx"))
+    ws = wb.active
+    # Target only row is row 7 (4 counts + blank + header + 1 data row)
+    fill = ws.cell(row=7, column=1).fill
+    assert fill.fgColor.rgb == "00FFE0B2"  # orange
+
+def test_excel_skips_target_only_with_invalid_pathB(tmp_path):
+    target_only = [("file.txt", "fake/pathB.txt")]
+    write_excel_output(str(tmp_path), [], [], [], target_only=target_only)
+    rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
+    assert len(rows) == 6  # counts + header only, no data row
+
+def test_excel_target_only_handles_timestamp_error(tmp_path, monkeypatch):
+    fileB = tmp_path / "fileB.txt"
+    fileB.write_text("content")
+
+    def fake_getmtime(path):
+        raise OSError("Permission denied")
+    monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
+
+    target_only = [("file.txt", str(fileB))]
+    write_excel_output(str(tmp_path), [], [], [], target_only=target_only)
+    rows = read_xlsx(str(tmp_path / "comparison.xlsx"))
+    assert len(rows) == 7  # counts + header + 1 target only row
+

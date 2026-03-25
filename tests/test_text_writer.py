@@ -40,7 +40,7 @@ def test_txt_empty_data_has_only_headers(tmp_path):
     write_text_output(str(tmp_path), [], [], [])
     content = read_txt(str(tmp_path / "comparison.txt"))
     lines = [line for line in content.splitlines() if line.strip()]
-    assert len(lines) == 7 # 4 count lines + 3 section headers
+    assert len(lines) == 8 # 4 count lines + 4 section headers
 
 # -----------------------------
 # Matches tests
@@ -214,4 +214,23 @@ def test_txt_has_count_lines(tmp_path):
     assert "Total Files in Target:   20" in content
     assert "Unique Filenames Source: 5" in content
     assert "Unique Filenames Target: 8" in content
+
+def test_txt_has_target_only_header(tmp_path):
+    write_text_output(str(tmp_path), [], [], [])
+    content = read_txt(str(tmp_path / "comparison.txt"))
+    assert "=== Target Only (in Folder B, not in Source) ===" in content
+
+def test_txt_writes_target_only(sample_files):
+    fileA, fileB, output_dir = sample_files
+    target_only = [("target_file.txt", fileB)]
+    write_text_output(output_dir, [], [], [], target_only=target_only)
+    content = read_txt(os.path.join(output_dir, "comparison.txt"))
+    assert "target_file.txt" in content
+    assert f"  B: {fileB}" in content
+
+def test_txt_skips_target_only_with_invalid_pathB(tmp_path):
+    target_only = [("file.txt", "fake/pathB.txt")]
+    write_text_output(str(tmp_path), [], [], [], target_only=target_only)
+    content = read_txt(str(tmp_path / "comparison.txt"))
+    assert "fake/pathB.txt" not in content
 

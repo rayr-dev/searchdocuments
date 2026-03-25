@@ -255,3 +255,30 @@ def test_csv_has_count_rows(tmp_path):
     assert rows[1][0] == "Total Files in Target:"
     assert rows[2][0] == "Unique Filenames Source:"
     assert rows[3][0] == "Unique Filenames Target:"
+
+def test_csv_writes_target_only(sample_files):
+    fileA, fileB, output_dir = sample_files
+    target_only = [("target_file.txt", fileB)]
+    write_csv_output(output_dir, [], [], [], target_only=target_only)
+    rows = read_csv(os.path.join(output_dir, "comparison.csv"))
+    statuses = [r[0] for r in rows[6:]]
+    assert "Target Only" in statuses
+
+def test_csv_skips_target_only_with_invalid_pathB(tmp_path):
+    target_only = [("file.txt", "fake/pathB.txt")]
+    write_csv_output(str(tmp_path), [], [], [], target_only=target_only)
+    rows = read_csv(str(tmp_path / "comparison.csv"))
+    assert len(rows) == 6  # counts + header only
+
+def test_csv_target_only_handles_timestamp_error(tmp_path, monkeypatch):
+    fileB = tmp_path / "fileB.txt"
+    fileB.write_text("content")
+
+    def fake_getmtime(path):
+        raise OSError("Permission denied")
+    monkeypatch.setattr(os.path, "getmtime", fake_getmtime)
+
+    target_only = [("file.txt", str(fileB))]
+    write_csv_output(str(tmp_path), [], [], [], target_only=target_only)
+    rows = read_csv(str(tmp_path / "comparison.csv"))
+    assert len(rows) == 7  # counts + header + 1 target only row

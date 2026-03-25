@@ -111,6 +111,20 @@ def write_text_output(output_dir,
 
                 f.write(f"{name}\n")
                 f.write(f"  A: {pathA}\n\n")
+
+            # ------------------------------------------------------------
+            # Target Only Files
+            # ------------------------------------------------------------
+            f.write("=== Target Only (in Folder B, not in Source) ===\n")
+
+            for name, pathB in target_only:
+
+                if not pathB or not os.path.exists(pathB):
+                    diag(f"Text: Skipping invalid pathB for target only: {pathB}")
+                    continue
+
+                f.write(f"{name}\n")
+                f.write(f"  B: {pathB}\n\n")
     except Exception as error:
         diag(f"ERROR writing Text report: {error}")
     diag("TEXT_WRITER/write_text_output Ending")
